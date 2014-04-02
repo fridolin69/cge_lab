@@ -16,7 +16,10 @@ ESC - quit
 #include <vector>
 #include <GL/glut.h>
 
+#include "Box.h"
 #include "Camera.h"
+#include "Renderer.h"
+#include "DrawableObjectBase.h"
 
 #define M_PI 3.1415
 
@@ -46,16 +49,14 @@ bool g_mouse_left_down = false;
 bool g_mouse_right_down = false;
 
 // Movement settings
-const float g_translation_speed = 0.05;
+const float g_translation_speed = 0.2;
 const float g_rotation_speed = M_PI / 180 * 0.2;
-
-int lab[100][100] = { { 0, 0 } };
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("FPS demo by Nghia Ho - Hit SPACEBAR to toggle FPS mode");
+	glutCreateWindow("Lab-Displa");
 
 	glutIgnoreKeyRepeat(1);
 
@@ -77,67 +78,11 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-void DrawBox(float x, float y, float size)
-{
-	glPushMatrix();
-
-		glTranslatef(x, 0, y);
-		glColor3f(0, 1, 0);
-
-		glBegin(GL_QUADS);
-
-			// bottom
-
-			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, size);
-			glVertex3f(size, 0, size);
-			glVertex3f(size, 0, 0);
-
-			// top
-
-			glVertex3f(0, size, 0);
-			glVertex3f(0, size, size);
-			glVertex3f(size, size, size);
-			glVertex3f(size, size, 0);
-
-			// front
-
-			glVertex3f(0, 0, size);
-			glVertex3f(0, size, size);
-			glVertex3f(size, size, size);
-			glVertex3f(size, 0, size);
-
-			// back
-
-			glVertex3f(0, 0, 0);
-			glVertex3f(0, size, 0);
-			glVertex3f(size, size, 0);
-			glVertex3f(size, 0, 0);
-
-			// left
-
-			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, size);
-			glVertex3f(0, size, size);
-			glVertex3f(0, size, 0);
-
-			// right
-
-			glVertex3f(size, 0, 0);
-			glVertex3f(size, 0, size);
-			glVertex3f(size, size, size);
-			glVertex3f(size, size, 0);
-
-		glEnd();
-
-	glPopMatrix();
-}
-
 void ReadMazeFile()
 {
 	fstream mazeFile;
 
-	mazeFile.open("maze\\maze2_unicursal.txt", fstream::in);
+	mazeFile.open("D:\\maze2_unicursal.txt", fstream::in);
 
 	if (!mazeFile.is_open())
 	{
@@ -145,70 +90,48 @@ void ReadMazeFile()
 		return;
 	}
 
-	char readchar;
-
 	int x = 0, y = 0, linelength = 0;
+	Vertex3D * position;
+	Box * box;
+
 
 	while (mazeFile.good())
 	{
-		readchar = char(mazeFile.get());
-		switch (readchar)
+		switch (char(mazeFile.get()))
 		{
 			// EOL -> define linelength and increase linenumber (y)
-		case '\n':
-		case '\r':
-			// do not increase linenumber for empty lines
-			if (x != 0)
-			{
-				if (linelength != 0 && linelength != x)
-				{
-
-				}
-				else
+			case '\n':
+			case '\r':
+				// do not increase linenumber for empty lines
+				if (x != 0)
 				{
 					linelength = x;
 					y++;
 					x = 0;
 				}
-			}
-			printf("\n");
-			break;
+				break;
 
-			// on # or ' ' fall through and add char to vector
-		case '#':
-			lab[x][y] = 1;
-			x++;
-			break;
+				// on # or ' ' fall through and add char to vector
+			case '#':
+				position = new Vertex3D(x, 0, y);
+				box = new Box(position, 1);
+				box->generate();
+				Renderer::getInstance().addDrawableObject(box);
+			case ' ':
+				x++;
+				break;
 
-		case ' ':
-			lab[x][y] = 0;
-			x++;
-			break;
-
-		case -1:
-			continue;
+			case -1:
+				continue;
 		}
 	}
 
 	mazeFile.close();
 }
 
-void PrintMaze()
-{
-	for (int y = 0; y < 100; y++)
-	{
-		for (int x = 0; x < 100; x++)
-		{
-			if (lab[x][y] == 1)
-			{
-				DrawBox(x, y, 1);
-			}
-		}
-	}
-}
-
 void Grid()
 {
+	// TODO: build drawable object for this
 	glPushMatrix();
 	glColor3f(1, 1, 1);
 
@@ -236,9 +159,7 @@ void Display(void) {
 
 	g_camera.Refresh();
 
-	PrintMaze();
-
-	Grid();
+	Renderer::getInstance().render();
 
 	glutSwapBuffers(); //swap the buffers
 }

@@ -1,5 +1,5 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
 #define M_PI 3.1415
 
