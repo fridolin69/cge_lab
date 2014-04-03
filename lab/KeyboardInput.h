@@ -1,11 +1,11 @@
 #ifndef _KEYBOARD_INPUT_H
 #define _KEYBOARD_INPUT_H
 
-
 // singleton class that handles keyboard input
 class KeyboardInput
 {
 private:
+	bool keysDown[256];
 
 private:
 	KeyboardInput();
@@ -22,7 +22,10 @@ public:
 		return instance;
 	}
 
+	void keyDown(unsigned char key);
+	void keyUp(unsigned char key);
 
+	bool isDown(unsigned char key);
 };
 
 #endif

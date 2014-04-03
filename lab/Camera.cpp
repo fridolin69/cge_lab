@@ -8,6 +8,11 @@ Camera::Camera()
 	this->init();
 }
 
+Camera::~Camera()
+{
+	
+}
+
 void Camera::init()
 {
 	this->yawAngle = 0.0;

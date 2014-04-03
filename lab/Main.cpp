@@ -20,6 +20,7 @@ ESC - quit
 #include "Camera.h"
 #include "Renderer.h"
 #include "DrawableObjectBase.h"
+#include "KeyboardInput.h"
 
 #define M_PI 3.1415
 
@@ -27,8 +28,8 @@ using namespace std;
 
 void Display();
 void Reshape(int w, int h);
-void Keyboard(unsigned char key, int x, int y);
-void KeyboardUp(unsigned char key, int x, int y);
+void keyDown(unsigned char key, int x, int y);
+void keyUp(unsigned char key, int x, int y);
 void MouseMotion(int x, int y);
 void Mouse(int button, int state, int x, int y);
 void Timer(int value);
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("Lab-Displa");
+	glutCreateWindow("Lab-Display");
 
 	glutIgnoreKeyRepeat(1);
 
@@ -65,8 +66,8 @@ int main(int argc, char **argv) {
 	glutMouseFunc(Mouse);
 	glutMotionFunc(MouseMotion);
 	glutPassiveMotionFunc(MouseMotion);
-	glutKeyboardFunc(Keyboard);
-	glutKeyboardUpFunc(KeyboardUp);
+	glutKeyboardFunc(keyDown);
+	glutKeyboardUpFunc(keyUp);
 	glutIdleFunc(Idle);
 
 	ReadMazeFile();
@@ -156,6 +157,8 @@ void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the color buffer and the depth buffer
 	glLoadIdentity();
 
+	Grid();
+
 	Renderer::getInstance().render();
 	Camera::getInstance().refresh();
 
@@ -174,37 +177,28 @@ void Reshape(int w, int h) {
 	glMatrixMode(GL_MODELVIEW); //set the matrix back to model
 }
 
-void Keyboard(unsigned char key, int x, int y)
+void keyDown(unsigned char key, int x, int y)
 {
-	if (key == 27) {
-		//exit(0);
-	}
+	KeyboardInput &keyboard = KeyboardInput::getInstance();
 
 	if (key == ' ') {
 		g_fps_mode = !g_fps_mode;
 
 		if (g_fps_mode) {
 			glutSetCursor(GLUT_CURSOR_NONE);
-			glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
+			//glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
 		}
 		else {
 			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 		}
 	}
 
-	if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
-		g_shift_down = true;
-	}
-	else {
-		g_shift_down = false;
-	}
-
-	g_key[key] = true;
+	keyboard.keyDown(key);
 }
 
-void KeyboardUp(unsigned char key, int x, int y)
+void keyUp(unsigned char key, int x, int y)
 {
-	g_key[key] = false;
+	KeyboardInput::getInstance().keyUp(key);
 }
 
 void Timer(int value)

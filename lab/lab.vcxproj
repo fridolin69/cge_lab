@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="KeyboardInput.cpp" />
     <ClCompile Include="Vertex3D.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -88,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="KeyboardInput.h" />
     <ClInclude Include="Vertex3D.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DrawableObjectBase.h" />
