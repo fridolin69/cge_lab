@@ -3,115 +3,127 @@
 #include <GL/glut.h>
 #include "Camera.h"
 
-void Camera::Init()
+Camera::Camera()
 {
-	m_yaw = 0.0;
-	m_pitch = 0.0;
-
-	SetPos(0, 0, 0);
+	this->init();
 }
 
-void Camera::Refresh()
+void Camera::init()
+{
+	this->yawAngle = 0.0;
+	this->pitchAngle = 0.0;
+
+	this->setPos(0, 0, 0);
+}
+
+void Camera::refresh()
 {
 	// Camera parameter according to Riegl's co-ordinate system
 	// x/y for flat, z for height
-	m_lx = cos(m_yaw) * cos(m_pitch);
-	m_ly = sin(m_pitch);
-	m_lz = sin(m_yaw) * cos(m_pitch);
+	this->xDirectionVec = cos(yawAngle) * cos(pitchAngle);
+	this->yDirectionVec = sin(pitchAngle);
+	this->zDirectionVec = sin(yawAngle) * cos(pitchAngle);
 
-	m_strafe_lx = cos(m_yaw - M_PI / 2);
-	m_strafe_lz = sin(m_yaw - M_PI / 2);
+	// calculate 90 degree vector
+	this->xDirectionVecStrafe = cos(yawAngle - M_PI / 2);
+	this->zDirectionVecStrafe = sin(yawAngle - M_PI / 2);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(m_x, m_y, m_z, m_x + m_lx, m_y + m_ly, m_z + m_lz, 0.0, 1.0, 0.0);
+	gluLookAt(  this->xPos, 
+				this->yPos, 
+				this->zPos, 
+				this->xPos + this->xDirectionVec,
+				this->yPos + this->yDirectionVec,
+				this->zPos + this->zDirectionVec,
+				0.0, 1.0, 0.0);
 
-	//printf("Camera: %f %f %f Direction vector: %f %f %f\n", m_x, m_y, m_z, m_lx, m_ly, m_lz);
+	//printf("Camera: %f %f %f Direction vector: %f %f %f\n", xPos, yPos, zPos, xDirectionVec, yDirectionVec, zDirectionVec);
 }
 
-void Camera::SetPos(float x, float y, float z)
+void Camera::setPos(float x, float y, float z)
 {
-	m_x = x;
-	m_y = y;
-	m_z = z;
+	this->xPos = x;
+	this->yPos = y;
+	this->zPos = z;
 
-	Refresh();
+	this->refresh();
 }
 
-void Camera::GetPos(float &x, float &y, float &z)
+void Camera::getPos(float &x, float &y, float &z)
 {
-	x = m_x;
-	y = m_y;
-	z = m_z;
+	x = xPos;
+	y = yPos;
+	z = zPos;
 }
 
-void Camera::GetDirectionVector(float &x, float &y, float &z)
+void Camera::getDirectionVector(float &x, float &y, float &z)
 {
-	x = m_lx;
-	y = m_ly;
-	z = m_lz;
+	x = xDirectionVec;
+	y = yDirectionVec;
+	z = zDirectionVec;
 }
 
-void Camera::Move(float incr)
+void Camera::move(float incr)
 {
-	float lx = cos(m_yaw)*cos(m_pitch);
-	float ly = sin(m_pitch);
-	float lz = sin(m_yaw)*cos(m_pitch);
+	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
+	float ly = sin(this->pitchAngle);
+	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
 
-	m_x = m_x + incr*lx;
-	m_y = m_y + incr*ly;
-	m_z = m_z + incr*lz;
+	xPos = xPos + incr * lx;
+	yPos = yPos + incr * ly;
+	zPos = zPos + incr * lz;
 
-	Refresh();
+	this->refresh();
 }
 
-void Camera::Strafe(float incr)
+void Camera::strafe(float incr)
 {
-	m_x = m_x + incr*m_strafe_lx;
-	m_z = m_z + incr*m_strafe_lz;
+	this->xPos =+ (incr * this->xDirectionVecStrafe);
+	this->zPos =+ (incr * this->zDirectionVecStrafe);
 
-	Refresh();
+	this->refresh();
 }
 
-void Camera::Fly(float incr)
+void Camera::fly(float incr)
 {
-	m_y = m_y + incr;
-
-	Refresh();
+	this->yPos =+ incr;
+	this->refresh();
 }
 
-void Camera::RotateYaw(float angle)
+void Camera::rotateYaw(float angle)
 {
-	m_yaw += angle;
-
-	Refresh();
+	this->yawAngle += angle;
+	this->refresh();
 }
 
-void Camera::RotatePitch(float angle)
+void Camera::rotatePitch(float angle)
 {
 	const float limit = 89.0 * M_PI / 180.0;
 
-	m_pitch -= angle;
+	this->pitchAngle -= angle;
 
-	if (m_pitch < -limit)
-		m_pitch = -limit;
+	if (this->pitchAngle < -limit)
+	{
+		this->pitchAngle = -limit;
+	}
 
-	if (m_pitch > limit)
-		m_pitch = limit;
+	if (this->pitchAngle > limit)
+	{
+		this->pitchAngle = limit;
+	}
 
-	Refresh();
+	this->refresh();
 }
 
-void Camera::SetYaw(float angle)
+void Camera::setYaw(float angle)
 {
-	m_yaw = angle;
-
-	Refresh();
+	this->yawAngle = angle;
+	this->refresh();
 }
 
-void Camera::SetPitch(float angle)
+void Camera::setPitch(float angle)
 {
-	m_pitch = angle;
-
-	Refresh();
+	this->pitchAngle = angle;
+	this->refresh();
 }

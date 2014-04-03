@@ -39,7 +39,6 @@ void Grid();
 void ReadMazeFile();
 void PrintMaze();
 
-Camera g_camera;
 bool g_key[256];
 bool g_shift_down = false;
 bool g_fps_mode = false;
@@ -157,9 +156,8 @@ void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the color buffer and the depth buffer
 	glLoadIdentity();
 
-	g_camera.Refresh();
-
 	Renderer::getInstance().render();
+	Camera::getInstance().refresh();
 
 	glutSwapBuffers(); //swap the buffers
 }
@@ -213,27 +211,27 @@ void Timer(int value)
 {
 	if (g_fps_mode) {
 		if (g_key['w'] || g_key['W']) {
-			g_camera.Move(g_translation_speed);
+			Camera::getInstance().move(g_translation_speed);
 		}
 
 		if (g_key['s'] || g_key['S']) {
-			g_camera.Move(-g_translation_speed);
+			Camera::getInstance().move(-g_translation_speed);
 		}
 
 		if (g_key['a'] || g_key['A']) {
-			g_camera.Strafe(g_translation_speed);
+			Camera::getInstance().strafe(g_translation_speed);
 		}
 
 		if (g_key['d'] || g_key['D']) {
-			g_camera.Strafe(-g_translation_speed);
+			Camera::getInstance().strafe(-g_translation_speed);
 		}
 
 		if (g_mouse_left_down) {
-			g_camera.Fly(-g_translation_speed);
+			Camera::getInstance().fly(-g_translation_speed);
 		}
 		
 		if (g_mouse_right_down) {
-			g_camera.Fly(g_translation_speed);
+			Camera::getInstance().fly(g_translation_speed);
 		}
 	}
 
@@ -281,11 +279,11 @@ void MouseMotion(int x, int y)
 		int dy = y - g_viewport_height / 2;
 
 		if (dx) {
-			g_camera.RotateYaw(g_rotation_speed*dx);
+			Camera::getInstance().rotateYaw(g_rotation_speed*dx);
 		}
 
 		if (dy) {
-			g_camera.RotatePitch(g_rotation_speed*dy);
+			Camera::getInstance().rotatePitch(g_rotation_speed*dy);
 		}
 
 		glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
