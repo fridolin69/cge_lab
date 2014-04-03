@@ -6,6 +6,7 @@
 Camera::Camera()
 {
 	this->init();
+	this->fpsMode = false;
 }
 
 Camera::~Camera()
@@ -84,8 +85,8 @@ void Camera::move(float incr)
 
 void Camera::strafe(float incr)
 {
-	this->xPos =+ (incr * this->xDirectionVecStrafe);
-	this->zPos =+ (incr * this->zDirectionVecStrafe);
+	this->xPos = this->xPos + incr * this->xDirectionVecStrafe;
+	this->zPos = this->zPos + incr * this->zDirectionVecStrafe;
 
 	this->refresh();
 }
@@ -131,4 +132,39 @@ void Camera::setPitch(float angle)
 {
 	this->pitchAngle = angle;
 	this->refresh();
+}
+
+float Camera::getRotationSpeed()
+{
+	return this->rotationSpeed;
+}
+
+float Camera::getTranslationSpeed()
+{
+	return this->translationSpeed;
+}
+
+void Camera::setRotationSpeed(float rotationSpeed)
+{
+	this->rotationSpeed = rotationSpeed;
+}
+
+void Camera::setTranslationSpeed(float translationSpeed)
+{
+	this->translationSpeed = translationSpeed;
+}
+
+void Camera::enableFPSMode()
+{
+	this->fpsMode = true;
+}
+
+void Camera::disableFPSMode()
+{
+	this->fpsMode = false;
+}
+
+bool Camera::isFPSMode()
+{
+	return this->fpsMode;
 }

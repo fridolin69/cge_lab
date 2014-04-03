@@ -15,6 +15,11 @@ private:
 	float yawAngle, pitchAngle; // Various rotation angles
 	float xDirectionVecStrafe, zDirectionVecStrafe; // Always 90 degree to direction vector
 
+	float translationSpeed;
+	float rotationSpeed;
+
+	bool fpsMode;
+
 private:
 	Camera();
 	~Camera();
@@ -29,6 +34,16 @@ public:
 	}
 
 public:
+	void setTranslationSpeed(float translationSpeed);
+	void setRotationSpeed(float rotationSpeed);
+
+	float getTranslationSpeed();
+	float getRotationSpeed();
+
+	void enableFPSMode();
+	void disableFPSMode();
+	bool isFPSMode();
+
 	void init();
 	void refresh();
 	void setPos(float x, float y, float z);

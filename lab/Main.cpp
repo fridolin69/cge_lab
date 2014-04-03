@@ -1,14 +1,3 @@
-/*
-FPS control demo in GLUT by Nghia Ho
-
-SPACEBAR - toggle FPS control
-W,A,S,D - to move
-mouse - look around, inverted mouse
-left/right mouse - fly up/down
-ESC - quit
-
-*/
-
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -40,19 +29,11 @@ void Grid();
 void ReadMazeFile();
 void PrintMaze();
 
-bool g_key[256];
-bool g_shift_down = false;
-bool g_fps_mode = false;
 int g_viewport_width = 0;
 int g_viewport_height = 0;
-bool g_mouse_left_down = false;
-bool g_mouse_right_down = false;
 
-// Movement settings
-const float g_translation_speed = 0.2;
-const float g_rotation_speed = M_PI / 180 * 0.2;
-
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
@@ -63,12 +44,14 @@ int main(int argc, char **argv) {
 	glutDisplayFunc(Display);
 	glutIdleFunc(Display);
 	glutReshapeFunc(Reshape);
-	glutMouseFunc(Mouse);
 	glutMotionFunc(MouseMotion);
 	glutPassiveMotionFunc(MouseMotion);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 	glutIdleFunc(Idle);
+
+	Camera::getInstance().setRotationSpeed(M_PI / 180 * 0.2);
+	Camera::getInstance().setTranslationSpeed(0.2);
 
 	ReadMazeFile();
 
@@ -157,10 +140,10 @@ void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the color buffer and the depth buffer
 	glLoadIdentity();
 
-	Grid();
+	//Grid();
 
-	Renderer::getInstance().render();
 	Camera::getInstance().refresh();
+	Renderer::getInstance().render();
 
 	glutSwapBuffers(); //swap the buffers
 }
@@ -180,16 +163,22 @@ void Reshape(int w, int h) {
 void keyDown(unsigned char key, int x, int y)
 {
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
+	Camera &camera = Camera::getInstance();
 
-	if (key == ' ') {
-		g_fps_mode = !g_fps_mode;
+	if (key == ' ') 
+	{
+		switch (camera.isFPSMode())
+		{
+			case true:
+				glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+				camera.disableFPSMode();
+				break;
 
-		if (g_fps_mode) {
-			glutSetCursor(GLUT_CURSOR_NONE);
-			//glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
-		}
-		else {
-			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+			case false:
+				glutSetCursor(GLUT_CURSOR_NONE);
+				glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
+				camera.enableFPSMode();
+				break;
 		}
 	}
 
@@ -203,29 +192,30 @@ void keyUp(unsigned char key, int x, int y)
 
 void Timer(int value)
 {
-	if (g_fps_mode) {
-		if (g_key['w'] || g_key['W']) {
-			Camera::getInstance().move(g_translation_speed);
+	KeyboardInput &keyboard = KeyboardInput::getInstance();
+	Camera &camera = Camera::getInstance();
+	float speed = camera.getTranslationSpeed();
+
+	if (camera.isFPSMode()) 
+	{
+		if (keyboard.isDown('w')) 
+		{
+			camera.move(speed);
 		}
 
-		if (g_key['s'] || g_key['S']) {
-			Camera::getInstance().move(-g_translation_speed);
+		if (keyboard.isDown('s')) 
+		{
+			camera.move(-speed);
 		}
 
-		if (g_key['a'] || g_key['A']) {
-			Camera::getInstance().strafe(g_translation_speed);
+		if (keyboard.isDown('a')) 
+		{
+			camera.strafe(speed);
 		}
 
-		if (g_key['d'] || g_key['D']) {
-			Camera::getInstance().strafe(-g_translation_speed);
-		}
-
-		if (g_mouse_left_down) {
-			Camera::getInstance().fly(-g_translation_speed);
-		}
-		
-		if (g_mouse_right_down) {
-			Camera::getInstance().fly(g_translation_speed);
+		if (keyboard.isDown('d')) 
+		{
+			camera.strafe(-speed);
 		}
 	}
 
@@ -237,47 +227,34 @@ void Idle()
 	Display();
 }
 
-void Mouse(int button, int state, int x, int y)
-{
-	if (state == GLUT_DOWN) {
-		if (button == GLUT_LEFT_BUTTON) {
-			g_mouse_left_down = true;
-		}
-		else if (button == GLUT_RIGHT_BUTTON) {
-			g_mouse_right_down = true;
-		}
-	}
-	else if (state == GLUT_UP) {
-		if (button == GLUT_LEFT_BUTTON) {
-			g_mouse_left_down = false;
-		}
-		else if (button == GLUT_RIGHT_BUTTON) {
-			g_mouse_right_down = false;
-		}
-	}
-}
-
 void MouseMotion(int x, int y)
 {
+	Camera &camera = Camera::getInstance();
+	float speed = camera.getRotationSpeed();
+
 	// This variable is hack to stop glutWarpPointer from triggering an event callback to Mouse(...)
 	// This avoids it being called recursively and hanging up the event loop
 	static bool just_warped = false;
 
-	if (just_warped) {
+	if (just_warped)
+	{
 		just_warped = false;
 		return;
 	}
 
-	if (g_fps_mode) {
+	if (camera.isFPSMode())
+	{
 		int dx = x - g_viewport_width / 2;
 		int dy = y - g_viewport_height / 2;
 
-		if (dx) {
-			Camera::getInstance().rotateYaw(g_rotation_speed*dx);
+		if (dx) 
+		{
+			camera.rotateYaw(speed * dx);
 		}
 
-		if (dy) {
-			Camera::getInstance().rotatePitch(g_rotation_speed*dy);
+		if (dy) 
+		{
+			camera.rotatePitch(speed * dy);
 		}
 
 		glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
