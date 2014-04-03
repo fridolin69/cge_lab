@@ -13,19 +13,19 @@ private:
 	
 protected:
 	int vertexCount;
-	GLenum type; // defines the type of geometry object the vertices should build, will be passed directly to glBegin()
-	Color * color;
+	GLenum type;					// defines the type of geometry object the vertices should build, will be passed directly to glBegin()
+	Color * color;					
 	Vertex3D * position;
 	Vertex3D ** vertices;
 
 public:
-	void generate(); // create the internal array returned at getObject()
+	virtual void generate() = 0;	// create the internal array returned at getVertices()
 
-	virtual Color * getColor() = 0; // return the color of the object
-	virtual GLenum getObjectType() = 0; // returns the GLenum of the object
-	virtual int getVertexCount() = 0; // returns the number of vertices returned
-	virtual Vertex3D ** getVertices() = 0; // returns the array of vertices
-	virtual Vertex3D * getPosition() = 0; // returns the translation vector
+	Vertex3D ** getVertices();		// returns the array of vertices
+	Color * getColor();				// return the color of the object
+	GLenum getObjectType();			// returns the GLenum of the object
+	Vertex3D * getPosition();		// returns the translation vector
+	int getVertexCount();			// returns the number of vertices returned
 };
 
 #endif

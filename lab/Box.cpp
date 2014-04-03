@@ -1,11 +1,12 @@
 #include "Box.h"
 
-Box::Box(Vertex3D * pos, GLfloat size)
+Box::Box(Vertex3D * pos, GLfloat size, Color * color)
 {
 	this->position = pos;
 	this->size = size;
 	this->vertexCount = 24;
 	this->type = GL_QUADS;
+	this->color = color;
 }
 
 void Box::generate()
@@ -57,31 +58,6 @@ void Box::generate()
 	vertices[21] = cornerC;
 	vertices[22] = cornerG;
 	vertices[23] = cornerF;
-}
-
-int Box::getVertexCount()
-{
-	return this->vertexCount;
-}
-
-Vertex3D ** Box::getVertices()
-{
-	return this->vertices;
-}
-
-Vertex3D * Box::getPosition()
-{
-	return this->position;
-}
-
-GLenum Box::getObjectType()
-{
-	return this->type;
-}
-
-Color * Box::getColor()
-{
-	return this->color;
 }
 
 Box::~Box()

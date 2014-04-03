@@ -2,7 +2,10 @@
 
 Color::Color(GLfloat red, GLfloat green, GLfloat blue)
 {
-	Color(red, green, blue, 1);
+	this->red = red;
+	this->green = green;
+	this->blue = blue;
+	this->alpha = 0;
 }
 
 Color::Color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)

@@ -6,62 +6,70 @@
 #include <GL/glut.h>
 
 #include "Box.h"
+#include "HorizontalSquarePlate.h"
 #include "Camera.h"
 #include "Renderer.h"
 #include "DrawableObjectBase.h"
 #include "KeyboardInput.h"
+#include "Window.h"
 
 #define M_PI 3.1415
 
 using namespace std;
 
-void Display();
-void Reshape(int w, int h);
+void display();
+void resize(int w, int h);
 void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
-void MouseMotion(int x, int y);
-void Mouse(int button, int state, int x, int y);
-void Timer(int value);
-void Idle();
+void mouseMotion(int x, int y);
+void timer(int value);
+void idle();
 
-void Grid();
-
-void ReadMazeFile();
-void PrintMaze();
+void readMazeFile();
+void printMaze();
 
 int g_viewport_width = 0;
 int g_viewport_height = 0;
 
+Window * window;
+
 int main(int argc, char **argv) 
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(640, 480);
-	glutCreateWindow("Lab-Display");
+
+	Camera &camera = Camera::getInstance();
+
+	window = new Window(1680, 1050, "Lab Display");
+	window->create();
 
 	glutIgnoreKeyRepeat(1);
 
-	glutDisplayFunc(Display);
-	glutIdleFunc(Display);
-	glutReshapeFunc(Reshape);
-	glutMotionFunc(MouseMotion);
-	glutPassiveMotionFunc(MouseMotion);
+	glutDisplayFunc(display);
+	glutIdleFunc(display);
+
+	glutReshapeFunc(resize);
+
+	glutMotionFunc(mouseMotion);
+	glutPassiveMotionFunc(mouseMotion);
+
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
-	glutIdleFunc(Idle);
 
-	Camera::getInstance().setRotationSpeed(M_PI / 180 * 0.2);
-	Camera::getInstance().setTranslationSpeed(0.2);
+	glutIdleFunc(idle);
 
-	ReadMazeFile();
+	camera.setRotationSpeed(M_PI / 180 * 0.2);
+	camera.setTranslationSpeed(0.2);
+	camera.setPos(-25, 0.5, 25);
 
-	glutTimerFunc(1, Timer, 0);
+	readMazeFile();
+
+	glutTimerFunc(1, timer, 0);
 	glutMainLoop();
 
 	return 0;
 }
 
-void ReadMazeFile()
+void readMazeFile()
 {
 	fstream mazeFile;
 
@@ -76,7 +84,9 @@ void ReadMazeFile()
 	int x = 0, y = 0, linelength = 0;
 	Vertex3D * position;
 	Box * box;
-
+	HorizontalSquarePlate * plate;
+	Color * boxColor = new Color(1, 1, 1);
+	Color * floorColor = new Color(0.7, 0, 0);
 
 	while (mazeFile.good())
 	{
@@ -96,10 +106,13 @@ void ReadMazeFile()
 
 				// on # or ' ' fall through and add char to vector
 			case '#':
+				x++;
 				position = new Vertex3D(x, 0, y);
-				box = new Box(position, 1);
+				box = new Box(position, 1, boxColor);
 				box->generate();
 				Renderer::getInstance().addDrawableObject(box);
+				break;
+
 			case ' ':
 				x++;
 				break;
@@ -110,54 +123,31 @@ void ReadMazeFile()
 	}
 
 	mazeFile.close();
+
+	for (int i = -10; i < linelength + 10; i++)
+	{
+		for (int j = -10; j < y + 10; j++)
+		{
+			position = new Vertex3D(i, 0, j);
+			plate = new HorizontalSquarePlate(position, 1, floorColor);
+			plate->generate();
+			Renderer::getInstance().addDrawableObject(plate);
+		}
+	}
 }
 
-void Grid()
+void display() 
 {
-	// TODO: build drawable object for this
-	glPushMatrix();
-	glColor3f(1, 1, 1);
+	Renderer &renderer = Renderer::getInstance();
 
-	for (int i = 0; i < 100; i++) {
-		glBegin(GL_LINES);
-		glVertex3f(i, 0, 0);
-		glVertex3f(i, 0, 100);
-		glEnd();
-	}
-
-	for (int i = 0; i < 100; i++) {
-		glBegin(GL_LINES);
-		glVertex3f(0, 0, i);
-		glVertex3f(100, 0, i);
-		glEnd();
-	}
-
-	glPopMatrix();
-}
-
-void Display(void) {
-	glClearColor(0.0, 0.0, 0.0, 1.0); //clear the screen to black
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the color buffer and the depth buffer
-	glLoadIdentity();
-
-	//Grid();
-
+	renderer.preRender();
 	Camera::getInstance().refresh();
-	Renderer::getInstance().render();
-
-	glutSwapBuffers(); //swap the buffers
+	renderer.render();
+	renderer.postRender();
 }
 
-void Reshape(int w, int h) {
-	g_viewport_width = w;
-	g_viewport_height = h;
-
-	glViewport(0, 0, (GLsizei)w, (GLsizei)h); //set the viewport to the current window specifications
-	glMatrixMode(GL_PROJECTION); //set the matrix to projection
-
-	glLoadIdentity();
-	gluPerspective(60, (GLfloat)w / (GLfloat)h, 0.1, 100.0); //set the perspective (angle of sight, width, height, ,depth)
-	glMatrixMode(GL_MODELVIEW); //set the matrix back to model
+void resize(int width, int height) {
+	window->resize(width, height);
 }
 
 void keyDown(unsigned char key, int x, int y)
@@ -176,7 +166,7 @@ void keyDown(unsigned char key, int x, int y)
 
 			case false:
 				glutSetCursor(GLUT_CURSOR_NONE);
-				glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
+				glutWarpPointer(window->getWidth() / 2, window->getHeight() / 2);
 				camera.enableFPSMode();
 				break;
 		}
@@ -190,7 +180,7 @@ void keyUp(unsigned char key, int x, int y)
 	KeyboardInput::getInstance().keyUp(key);
 }
 
-void Timer(int value)
+void timer(int value)
 {
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
 	Camera &camera = Camera::getInstance();
@@ -219,15 +209,15 @@ void Timer(int value)
 		}
 	}
 
-	glutTimerFunc(1, Timer, 0);
+	glutTimerFunc(10, timer, 0);
 }
 
-void Idle()
+void idle()
 {
-	Display();
+	display();
 }
 
-void MouseMotion(int x, int y)
+void mouseMotion(int x, int y)
 {
 	Camera &camera = Camera::getInstance();
 	float speed = camera.getRotationSpeed();
@@ -244,20 +234,20 @@ void MouseMotion(int x, int y)
 
 	if (camera.isFPSMode())
 	{
-		int dx = x - g_viewport_width / 2;
-		int dy = y - g_viewport_height / 2;
+		int deltaX = x - window->getWidth() / 2;
+		int deltaY = y - window->getHeight() / 2;
 
-		if (dx) 
+		if (deltaX != 0) 
 		{
-			camera.rotateYaw(speed * dx);
+			camera.rotateYaw(speed * deltaX);
 		}
 
-		if (dy) 
+		if (deltaY != 0) 
 		{
-			camera.rotatePitch(speed * dy);
+			camera.rotatePitch(speed * deltaY);
 		}
 
-		glutWarpPointer(g_viewport_width / 2, g_viewport_height / 2);
+		glutWarpPointer(window->getWidth() / 2, window->getHeight() / 2);
 
 		just_warped = true;
 	}

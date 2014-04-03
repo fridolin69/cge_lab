@@ -21,6 +21,9 @@ void Renderer::render()
 	{
 		glPushMatrix();
 			glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
+
+			glColor4f(object->getColor()->getRed(), object->getColor()->getGreen(), object->getColor()->getBlue(), object->getColor()->getAlpha());
+
 			glBegin(object->getObjectType()); // request object type
 
 				Vertex3D ** vertices = object->getVertices(); // request vertex-Array
@@ -43,4 +46,17 @@ void Renderer::render()
 			glEnd();
 		glPopMatrix();
 	}
+}
+
+void Renderer::preRender()
+{
+	glClearColor(0.0, 0.0, 0.0, 1.0); //clear the screen to black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the color buffer and the depth buffer
+	glEnable(GL_DEPTH_TEST);
+	glLoadIdentity();
+}
+
+void Renderer::postRender()
+{
+	glutSwapBuffers();
 }

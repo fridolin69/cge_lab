@@ -20,17 +20,10 @@ private:
 	GLfloat size;
 
 public:
-	// TODO set color here too
-	Box(Vertex3D * pos, GLfloat size);
+	Box(Vertex3D * pos, GLfloat size, Color * color);
 	virtual ~Box();
 
 	void generate();
-
-	int getVertexCount();
-	Color * getColor();
-	GLenum getObjectType();
-	Vertex3D ** getVertices(); // will return an array of 24 vertices, because this is a box
-	Vertex3D * getPosition(); // return the translation vector
 };
 
 #endif

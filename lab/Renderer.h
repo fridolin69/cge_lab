@@ -26,7 +26,10 @@ public:
 		return instance;
 	}
 
+	void preRender();
+	void postRender();
 	void render(); // iterate over all objects and render them
+
 	void addDrawableObject(DrawableObjectBase * object);
 };
 
