@@ -31,7 +31,7 @@ void Renderer::render()
 				Vertex3D ** vertices = object->getVertices(); // request vertex-Array
 				TexCoords ** texCoords = object->getTexCoords();
 
-				if (vertices == NULL)
+				if (vertices == nullptr)
 				{
 					continue;
 				}
@@ -39,17 +39,21 @@ void Renderer::render()
 				// draw every vertex of the object
 				for (int i = 0; i < object->getVertexCount(); i++)
 				{
-					if (vertices[i] == NULL || texCoords[i] == NULL) // prevent objects from crashing the render engine
+					if (vertices[i] == nullptr) // prevent objects from crashing the render engine
 					{
 						continue;
 					}
-					glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
+
+					if (texCoords[i] != nullptr)
+					{
+						glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
+					}
+
 					glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
 				}
 
 			glEnd();
 
-			//glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
 	}
 }
@@ -57,6 +61,7 @@ void Renderer::render()
 void Renderer::preRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glLoadIdentity();
 }
 
