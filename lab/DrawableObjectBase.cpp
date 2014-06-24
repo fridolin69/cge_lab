@@ -10,6 +10,16 @@ Vertex3D ** DrawableObjectBase::getVertices()
 	return this->vertices;
 }
 
+GLuint DrawableObjectBase::getTexture()
+{
+	return this->texture;
+}
+
+TexCoords** DrawableObjectBase::getTexCoords()
+{
+	return this->texCoords;
+}
+
 Vertex3D * DrawableObjectBase::getPosition()
 {
 	return this->position;
@@ -18,9 +28,4 @@ Vertex3D * DrawableObjectBase::getPosition()
 GLenum DrawableObjectBase::getObjectType()
 {
 	return this->type;
-}
-
-Color * DrawableObjectBase::getColor()
-{
-	return this->color;
 }

@@ -6,9 +6,7 @@
 class Vertex3D
 {
 private:
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
+	GLfloat x, y, z;
 
 public:
 	Vertex3D();

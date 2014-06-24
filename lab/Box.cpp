@@ -1,12 +1,12 @@
 #include "Box.h"
 
-Box::Box(Vertex3D * pos, GLfloat size, Color * color)
+Box::Box(Vertex3D * pos, GLfloat size, GLuint texture)
 {
 	this->position = pos;
 	this->size = size;
 	this->vertexCount = 24;
 	this->type = GL_QUADS;
-	this->color = color;
+	this->texture = texture;
 }
 
 void Box::generate()
@@ -21,7 +21,21 @@ void Box::generate()
 	this->cornerG = new Vertex3D(size, size, size);
 	this->cornerH = new Vertex3D(0, size, size);
 
+	texCoords = new TexCoords *[this->vertexCount];
 	vertices = new Vertex3D *[this->vertexCount];
+
+	auto texCor1 = new TexCoords(0.0f, 0.0f);
+	auto texCor2 = new TexCoords(1.0f, 0.0f);
+	auto texCor3 = new TexCoords(0.0f, 1.0f);
+	auto texCor4 = new TexCoords(1.0f, 1.0f);
+
+	for (int i = 0; i < this->vertexCount; i = i + 4)
+	{
+		texCoords[i] = texCor1;
+		texCoords[i+1] = texCor2;
+		texCoords[i+2] = texCor3;
+		texCoords[i+3] = texCor4;
+	}
 
 	// bottom plate
 	vertices[0] = cornerA;

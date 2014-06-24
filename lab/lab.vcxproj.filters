@@ -39,10 +39,13 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HorizontalSquarePlate.cpp">
+    <ClCompile Include="DrawableObjectBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DrawableObjectBase.cpp">
+    <ClCompile Include="TexCoords.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tga.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,7 +74,10 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HorizontalSquarePlate.h">
+    <ClInclude Include="TexCoords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tga.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

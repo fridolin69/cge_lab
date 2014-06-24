@@ -20,10 +20,10 @@ private:
 	GLfloat size;
 
 public:
-	Box(Vertex3D * pos, GLfloat size, Color * color);
+	Box(Vertex3D * pos, GLfloat size, GLuint texture);
 	virtual ~Box();
 
-	void generate();
+	void generate() override;
 };
 
 #endif

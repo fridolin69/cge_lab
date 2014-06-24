@@ -51,7 +51,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -81,8 +81,9 @@
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DrawableObjectBase.cpp" />
-    <ClCompile Include="HorizontalSquarePlate.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
+    <ClCompile Include="TexCoords.cpp" />
+    <ClCompile Include="tga.cpp" />
     <ClCompile Include="Vertex3D.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -92,8 +93,9 @@
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="HorizontalSquarePlate.h" />
     <ClInclude Include="KeyboardInput.h" />
+    <ClInclude Include="TexCoords.h" />
+    <ClInclude Include="tga.h" />
     <ClInclude Include="Vertex3D.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DrawableObjectBase.h" />

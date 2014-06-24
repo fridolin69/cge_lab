@@ -5,8 +5,8 @@
 #include <vector>
 #include <GL/glut.h>
 
+
 #include "Box.h"
-#include "HorizontalSquarePlate.h"
 #include "Camera.h"
 #include "Renderer.h"
 #include "DrawableObjectBase.h"
@@ -14,6 +14,7 @@
 #include "Window.h"
 
 #define M_PI 3.1415
+#include "tga.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ void keyUp(unsigned char key, int x, int y);
 void mouseMotion(int x, int y);
 void timer(int value);
 void idle();
+void reportGLError(const char * msg);
 
 void readMazeFile();
 void printMaze();
@@ -73,7 +75,7 @@ void readMazeFile()
 {
 	fstream mazeFile;
 
-	mazeFile.open("D:\\maze2_unicursal.txt", fstream::in);
+	mazeFile.open("C:\\maze2_unicursal.txt", fstream::in);
 
 	if (!mazeFile.is_open())
 	{
@@ -84,9 +86,50 @@ void readMazeFile()
 	int x = 0, y = 0, linelength = 0;
 	Vertex3D * position;
 	Box * box;
-	HorizontalSquarePlate * plate;
 	Color * boxColor = new Color(1, 1, 1);
 	Color * floorColor = new Color(0.7, 0, 0);
+
+	GLuint texture;
+	int imageW, imageH;
+	tgaInfo * info = tgaLoad("C:\\texture.tga");
+	int mode;
+
+	if (info->status != TGA_OK) {
+		fprintf(stderr, "error loading texture image: %d\n", info->status);
+
+		return;
+	}
+	if (info->width != info->height) {
+		fprintf(stderr, "Image size %d x %d is not rectangular, giving up.\n",
+			info->width, info->height);
+		return;
+	}
+
+	mode = info->pixelDepth / 8;  // will be 3 for rgb, 4 for rgba
+	glGenTextures(1, &texture);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	// Upload the texture bitmap. 
+	imageH = info->width;
+	imageW = info->height;
+
+	reportGLError("before uploading texture");
+	GLint format = (mode == 4) ? GL_RGBA : GL_RGB;
+	glTexImage2D(GL_TEXTURE_2D, 0, format, imageW, imageH, 0, format,
+		GL_UNSIGNED_BYTE, info->imageData);
+	reportGLError("after uploading texture");
+
+	tgaDestroy(info);
 
 	while (mazeFile.good())
 	{
@@ -104,11 +147,10 @@ void readMazeFile()
 				}
 				break;
 
-				// on # or ' ' fall through and add char to vector
 			case '#':
 				x++;
 				position = new Vertex3D(x, 0, y);
-				box = new Box(position, 1, boxColor);
+				box = new Box(position, 1, texture);
 				box->generate();
 				Renderer::getInstance().addDrawableObject(box);
 				break;
@@ -124,25 +166,22 @@ void readMazeFile()
 
 	mazeFile.close();
 
-	for (int i = -10; i < linelength + 10; i++)
-	{
-		for (int j = -10; j < y + 10; j++)
-		{
-			position = new Vertex3D(i, 0, j);
-			plate = new HorizontalSquarePlate(position, 1, floorColor);
-			plate->generate();
-			Renderer::getInstance().addDrawableObject(plate);
-		}
-	}
+	/*HorizontalSquarePlate * plate;
+	position = new Vertex3D(-10, -10, 100);
+	plate = new HorizontalSquarePlate(position, 1, floorColor);
+	plate->generate();
+	Renderer::getInstance().addDrawableObject(plate);*/
 }
 
 void display() 
 {
 	Renderer &renderer = Renderer::getInstance();
+	Camera &camera = Camera::getInstance();
 
 	renderer.preRender();
-	Camera::getInstance().refresh();
+	camera.refresh();
 	renderer.render();
+
 	renderer.postRender();
 }
 
@@ -250,5 +289,15 @@ void mouseMotion(int x, int y)
 		glutWarpPointer(window->getWidth() / 2, window->getHeight() / 2);
 
 		just_warped = true;
+	}
+}
+
+void reportGLError(const char * msg)
+{
+	GLenum errCode;
+	const GLubyte *errString;
+	while ((errCode = glGetError()) != GL_NO_ERROR) {
+		errString = gluErrorString(errCode);
+		fprintf(stdout, "OpenGL Error: %s %s\n", msg, errString);
 	}
 }
