@@ -45,7 +45,7 @@
     <ClCompile Include="TexCoords.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tga.cpp">
+    <ClCompile Include="TgaTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClInclude Include="TexCoords.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tga.h">
+    <ClInclude Include="TgaTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
