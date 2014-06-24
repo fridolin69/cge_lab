@@ -4,6 +4,7 @@
 #include "Vertex3D.h"
 #include "Color.h"
 #include "TexCoords.h"
+#include "TgaTexture.h"
 
 // base class for any drawable object
 class DrawableObjectBase
@@ -17,16 +18,18 @@ protected:
 	Vertex3D ** vertices;
 
 	TexCoords ** texCoords;
-	GLuint texture;
+	TgaTexture * texture;
 
 public:
+
+	DrawableObjectBase(Vertex3D* position, TgaTexture* texture);
 	virtual ~DrawableObjectBase() {}
 
 	virtual void generate() = 0;	// create the internal array returned at getVertices()
 
 	Vertex3D ** getVertices();		// returns the array of vertices
 
-	GLuint getTexture();
+	TgaTexture * getTexture();
 	TexCoords ** getTexCoords();
 
 	GLenum getObjectType();			// returns the GLenum of the object

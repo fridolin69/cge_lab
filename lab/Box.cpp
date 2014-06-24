@@ -1,12 +1,11 @@
 #include "Box.h"
 
-Box::Box(Vertex3D * pos, GLfloat size, GLuint texture)
+
+Box::Box(Vertex3D* position, GLfloat size, TgaTexture* texture)
+	: DrawableObjectBase(position, texture), size(size)
 {
-	this->position = pos;
-	this->size = size;
 	this->vertexCount = 24;
 	this->type = GL_QUADS;
-	this->texture = texture;
 }
 
 void Box::generate()
@@ -25,9 +24,9 @@ void Box::generate()
 	vertices = new Vertex3D *[this->vertexCount];
 
 	auto texCor1 = new TexCoords(0.0f, 0.0f);
-	auto texCor2 = new TexCoords(1.0f, 0.0f);
-	auto texCor3 = new TexCoords(1.0f, 1.0f);
-	auto texCor4 = new TexCoords(0.0f, 1.0f);
+	auto texCor2 = new TexCoords(size, 0.0f);
+	auto texCor3 = new TexCoords(size, size);
+	auto texCor4 = new TexCoords(0.0f, size);
 
 	for (int i = 0; i < this->vertexCount; i = i + 4)
 	{
@@ -87,4 +86,5 @@ Box::~Box()
 	delete this->cornerH;
 
 	delete this->position;
+	delete this->vertices;
 }

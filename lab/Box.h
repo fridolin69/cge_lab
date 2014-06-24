@@ -20,7 +20,7 @@ private:
 	GLfloat size;
 
 public:
-	Box(Vertex3D * pos, GLfloat size, GLuint texture);
+	Box(Vertex3D* position, GLfloat size, TgaTexture* texture);
 	virtual ~Box();
 
 	void generate() override;

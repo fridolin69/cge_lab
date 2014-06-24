@@ -1,4 +1,5 @@
 #include "DrawableObjectBase.h"
+#include "TgaTexture.h"
 
 int DrawableObjectBase::getVertexCount()
 {
@@ -10,9 +11,15 @@ Vertex3D ** DrawableObjectBase::getVertices()
 	return this->vertices;
 }
 
-GLuint DrawableObjectBase::getTexture()
+TgaTexture * DrawableObjectBase::getTexture()
 {
 	return this->texture;
+}
+
+DrawableObjectBase::DrawableObjectBase(Vertex3D* position, TgaTexture* texture)
+	: position(position), texture(texture)
+{
+	
 }
 
 TexCoords** DrawableObjectBase::getTexCoords()

@@ -24,7 +24,10 @@ void Renderer::render()
 			glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-			glBindTexture(GL_TEXTURE_2D, object->getTexture());
+
+			glBindTexture(GL_TEXTURE_2D, object->getTexture()->getTextureId());
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, object->getTexture()->getWrapMode());
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, object->getTexture()->getWrapMode());
 
 			glBegin(object->getObjectType()); // request object type
 
@@ -44,11 +47,7 @@ void Renderer::render()
 						continue;
 					}
 
-					if (texCoords[i] != nullptr)
-					{
-						glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
-					}
-
+					glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
 					glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
 				}
 

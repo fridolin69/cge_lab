@@ -14,6 +14,7 @@
 #include <GL\glut.h>
 
 #define M_PI 3.1415
+#include "Plate.h"
 
 using namespace std;
 
@@ -60,7 +61,7 @@ int main(int argc, char **argv)
 
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
 	camera.setTranslationSpeed(0.2);
-	camera.setPos(-25, 0.5, 25);
+	camera.setPos(-5, 5, 25);
 
 	readMazeFile();
 
@@ -85,13 +86,12 @@ void readMazeFile()
 	int x = 0, y = 0, linelength = 0;
 	Vertex3D * position;
 	Box * box;
-	Color * boxColor = new Color(1, 1, 1);
-	Color * floorColor = new Color(0.7, 0, 0);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 
-	TgaTexture * tgaTex = new TgaTexture("C:\\texture.tga");
+	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
+	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
 
 	while (mazeFile.good())
 	{
@@ -112,7 +112,7 @@ void readMazeFile()
 			case '#':
 				x++;
 				position = new Vertex3D(x, 0, y);
-				box = new Box(position, 1, tgaTex->getTextureId());
+				box = new Box(position, 1, boxTga);
 				box->generate();
 				Renderer::getInstance().addDrawableObject(box);
 				break;
@@ -127,6 +127,10 @@ void readMazeFile()
 	}
 
 	mazeFile.close();
+
+	Plate * plate = new Plate(new Vertex3D(0, 0, 0), 70, sandTga);
+	plate->generate();
+	Renderer::getInstance().addDrawableObject(plate);
 }
 
 void display() 

@@ -82,6 +82,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DrawableObjectBase.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
+    <ClCompile Include="Plate.cpp" />
     <ClCompile Include="TexCoords.cpp" />
     <ClCompile Include="TgaTexture.cpp" />
     <ClCompile Include="Vertex3D.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="Box.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="KeyboardInput.h" />
+    <ClInclude Include="Plate.h" />
     <ClInclude Include="TexCoords.h" />
     <ClInclude Include="TgaTexture.h" />
     <ClInclude Include="Vertex3D.h" />
