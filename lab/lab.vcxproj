@@ -86,6 +86,7 @@
     <ClCompile Include="Plate.cpp" />
     <ClCompile Include="TexCoords.cpp" />
     <ClCompile Include="TgaTexture.cpp" />
+    <ClCompile Include="Util.cpp" />
     <ClCompile Include="Vertex3D.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="Plate.h" />
     <ClInclude Include="TexCoords.h" />
     <ClInclude Include="TgaTexture.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="Vertex3D.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DrawableObjectBase.h" />

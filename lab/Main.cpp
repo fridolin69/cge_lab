@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <time.h>
 #include <vector>
 
 #include "Plate.h"
@@ -18,6 +20,8 @@
 #define M_PI 3.1415
 #define MAX_FPS 60.0f
 #define MSEC_DISPLAY_TIMER (1000.0f / MAX_FPS)
+#include <algorithm>
+#include "Util.h"
 
 using namespace std;
 
@@ -33,11 +37,15 @@ void displayTimer(int value);
 void reportGLError(const char * msg);
 bool canMoveTo(float x, float z);
 
+
+
 int g_viewport_width = 0;
 int g_viewport_height = 0;
 
 Window * window;
 Maze * maze;
+
+vector<long> * lastRenderDurations = new vector<long>(5);
 
 int main(int argc, char **argv) 
 {
@@ -66,8 +74,6 @@ int main(int argc, char **argv)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 
-
-
 	maze = new Maze("C:\\maze1_small.txt");
 	maze->parse();
 
@@ -85,9 +91,6 @@ int main(int argc, char **argv)
 	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth() + 2, sandTga);
 	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
-
-
-
 
 	glutTimerFunc(10, processInput, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
@@ -145,7 +148,15 @@ void keyUp(unsigned char key, int x, int y)
 
 void displayTimer(int value)
 {
+	static int index = 0;
+
+	cout << "Avg time: " << Util::avg(lastRenderDurations) << " ms" << endl;
+
+	long beforeDisplay = clock();
+
 	display();
+
+	lastRenderDurations->at(index++ % 5) = clock() - beforeDisplay;
 
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
 }
