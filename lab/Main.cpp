@@ -27,6 +27,7 @@ void mouseMotion(int x, int y);
 void timer(int value);
 void idle();
 void reportGLError(const char * msg);
+bool canMoveTo(float x, float z);
 
 int g_viewport_width = 0;
 int g_viewport_height = 0;
@@ -145,38 +146,31 @@ void timer(int value)
 	{
 		if (keyboard.isDown('w')) 
 		{
-			if (camera.canMove(speed * 2, maze))
-			{
-				camera.move(speed);
-			}
+			camera.move(speed, canMoveTo);
 		}
 
 		if (keyboard.isDown('s')) 
 		{
-			if (camera.canMove(-speed * 2, maze))
-			{
-				camera.move(-speed);
-			}
+			camera.move(-speed, canMoveTo);
 		}
 
 		if (keyboard.isDown('a')) 
 		{
-			if (camera.canStrafe(speed * 2, maze))
-			{
-				camera.strafe(speed);
-			}
+			camera.strafe(speed, canMoveTo);
 		}
 
 		if (keyboard.isDown('d')) 
 		{
-			if (camera.canStrafe(-speed * 2, maze))
-			{
-				camera.strafe(-speed);
-			}
+			camera.strafe(-speed, canMoveTo);
 		}
 	}
 
 	glutTimerFunc(10, timer, 0);
+}
+
+bool canMoveTo(float x, float z)
+{
+	return maze->at(x, z) == ' ';
 }
 
 void idle()

@@ -2,7 +2,7 @@
 #define _CAMERA_H_
 
 #define M_PI 3.1415
-#include "Maze.h"
+#include <functional>
 
 /*
 Generic camera class by Nghia Ho
@@ -54,11 +54,8 @@ public:
 	void setPitch(float angle);
 
 	// Navigation
-	bool canMove(float incr, Maze * maze);
-	bool canStrafe(float incr, Maze * maze);
-
-	void move(float incr);
-	void strafe(float incr);
+	void move(float incr, std::function<bool(float, float)> predicate);
+	void strafe(float incr, std::function<bool(float, float)> predicate);
 	void fly(float incr);
 	void rotateYaw(float angle);
 	void rotatePitch(float angle);

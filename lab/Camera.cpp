@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "Camera.h"
-#include "Maze.h"
 #include <GL/glut.h>
 
 Camera::Camera()
@@ -71,63 +70,52 @@ void Camera::getDirectionVector(float &x, float &y, float &z)
 	z = zDirectionVec;
 }
 
-bool Camera::canMove(float incr, Maze * maze)
+void Camera::move(float incr, std::function<bool(float, float)> predicate)
 {
 	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
 	//float ly = sin(this->pitchAngle);
 	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
+
+	float oldX = xPos;
+	float oldZ = zPos;
 
 	float xPosTmp = xPos + incr * lx;
-	//float yPosTmp = yPos + incr * ly;
+
+	if (predicate(xPosTmp, oldZ))
+	{
+		xPos = xPosTmp;
+	}
+
 	float zPosTmp = zPos + incr * lz;
 
-	if (maze->at(xPosTmp, zPosTmp) == ' ')
+	if (predicate(oldX, zPosTmp))
 	{
-		return true;
+		zPos = zPosTmp;
 	}
-	else
-	{
-		return false;
-	}
-}
-
-void Camera::move(float incr)
-{
-	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
-	//float ly = sin(this->pitchAngle);
-	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
-
-	xPos = xPos + incr * lx;
+	
 	//yPos = yPos + incr * ly;
-	zPos = zPos + incr * lz;
 
 	this->refresh();
 }
 
-bool Camera::canStrafe(float incr, Maze * maze)
+void Camera::strafe(float incr, std::function<bool(float, float)> predicate)
 {
-	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
-	//float ly = sin(this->pitchAngle);
-	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
+	float oldX = xPos;
+	float oldZ = zPos;
 
-	float xPosTmp = xPos + incr * lx;
-	//float yPosTmp = yPos + incr * ly;
-	float zPosTmp = zPos + incr * lz;
+	float xPosTmp = this->xPos + incr * this->xDirectionVecStrafe;
 
-	if (maze->at(xPosTmp, zPosTmp) == ' ')
+	if (predicate(xPosTmp, oldZ))
 	{
-		return true;
+		xPos = xPosTmp;
 	}
-	else
-	{
-		return false;
-	}
-}
 
-void Camera::strafe(float incr)
-{
-	this->xPos = this->xPos + incr * this->xDirectionVecStrafe;
-	this->zPos = this->zPos + incr * this->zDirectionVecStrafe;
+	float zPosTmp = this->zPos + incr * this->zDirectionVecStrafe;
+
+	if (predicate(oldX, zPosTmp))
+	{
+		zPos = zPosTmp;
+	}
 
 	this->refresh();
 }
