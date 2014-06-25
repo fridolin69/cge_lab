@@ -16,6 +16,8 @@
 #include <GL\glut.h>
 
 #define M_PI 3.1415
+#define MAX_FPS 60.0f
+#define MSEC_DISPLAY_TIMER (1000.0f / MAX_FPS)
 
 using namespace std;
 
@@ -24,8 +26,10 @@ void resize(int w, int h);
 void keyDown(unsigned char key, int x, int y);
 void keyUp(unsigned char key, int x, int y);
 void mouseMotion(int x, int y);
-void timer(int value);
-void idle();
+
+void processInput(int value);
+void displayTimer(int value);
+
 void reportGLError(const char * msg);
 bool canMoveTo(float x, float z);
 
@@ -47,8 +51,6 @@ int main(int argc, char **argv)
 	glutIgnoreKeyRepeat(1);
 
 	glutDisplayFunc(display);
-	glutIdleFunc(display);
-
 	glutReshapeFunc(resize);
 
 	glutMotionFunc(mouseMotion);
@@ -57,16 +59,16 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
 
-	glutIdleFunc(idle);
-
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
-	camera.setTranslationSpeed(0.3);
-	camera.setPos(-5, 0.5f, 25);
+	camera.setTranslationSpeed(0.1);
+	camera.setPos(-2, 0.5f, -2);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 
-	maze = new Maze("C:\\maze2_unicursal.txt");
+
+
+	maze = new Maze("C:\\maze1_small.txt");
 	maze->parse();
 
 	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
@@ -80,11 +82,16 @@ int main(int argc, char **argv)
 	},
 		nullptr);
 
-	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth(), sandTga);
+	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth() + 2, sandTga);
 	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
 
-	glutTimerFunc(1, timer, 0);
+
+
+
+	glutTimerFunc(10, processInput, 0);
+	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+
 	glutMainLoop();
 
 	return 0;
@@ -136,7 +143,14 @@ void keyUp(unsigned char key, int x, int y)
 	KeyboardInput::getInstance().keyUp(key);
 }
 
-void timer(int value)
+void displayTimer(int value)
+{
+	display();
+
+	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+}
+
+void processInput(int value)
 {
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
 	Camera &camera = Camera::getInstance();
@@ -165,17 +179,12 @@ void timer(int value)
 		}
 	}
 
-	glutTimerFunc(10, timer, 0);
+	glutTimerFunc(10, processInput, 0);
 }
 
 bool canMoveTo(float x, float z)
 {
 	return maze->at(x, z) == ' ';
-}
-
-void idle()
-{
-	display();
 }
 
 void mouseMotion(int x, int y)

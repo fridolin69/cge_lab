@@ -16,7 +16,7 @@ char Maze::at(int x, int y)
 		this->parse();
 	}
 
-	if (x > width || x < 0 || y > height || y < 0)
+	if (x >= width || x < 0 || y >= height || y < 0)
 	{
 		return ' ';
 	}
@@ -103,6 +103,8 @@ void Maze::parse()
 			continue;
 		}
 	}
+
+	maze->resize(maze->size() - 1);
 
 	width = linelength;
 	height = y;
