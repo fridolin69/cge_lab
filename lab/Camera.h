@@ -2,6 +2,7 @@
 #define _CAMERA_H_
 
 #define M_PI 3.1415
+#include "Maze.h"
 
 /*
 Generic camera class by Nghia Ho
@@ -53,6 +54,9 @@ public:
 	void setPitch(float angle);
 
 	// Navigation
+	bool canMove(float incr, Maze * maze);
+	bool canStrafe(float incr, Maze * maze);
+
 	void move(float incr);
 	void strafe(float incr);
 	void fly(float incr);

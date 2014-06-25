@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 
+#include "Plate.h"
+#include "Maze.h"
 #include "Box.h"
 #include "Camera.h"
 #include "Renderer.h"
@@ -14,7 +16,6 @@
 #include <GL\glut.h>
 
 #define M_PI 3.1415
-#include "Plate.h"
 
 using namespace std;
 
@@ -27,13 +28,11 @@ void timer(int value);
 void idle();
 void reportGLError(const char * msg);
 
-void readMazeFile();
-void printMaze();
-
 int g_viewport_width = 0;
 int g_viewport_height = 0;
 
 Window * window;
+Maze * maze;
 
 int main(int argc, char **argv) 
 {
@@ -60,77 +59,34 @@ int main(int argc, char **argv)
 	glutIdleFunc(idle);
 
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
-	camera.setTranslationSpeed(0.2);
-	camera.setPos(-5, 5, 25);
+	camera.setTranslationSpeed(0.3);
+	camera.setPos(-5, 0.5f, 25);
 
-	readMazeFile();
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+
+	maze = new Maze("C:\\maze2_unicursal.txt");
+	maze->parse();
+
+	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
+	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
+
+	maze->walk([boxTga](int x, int y) -> void { 
+		Vertex3D * position = new Vertex3D(x, 0, y);
+		Box * box = new Box(position, 1, boxTga);
+		box->generate();
+		Renderer::getInstance().addDrawableObject(box);
+	},
+		nullptr);
+
+	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth(), sandTga);
+	floor->generate();
+	Renderer::getInstance().addDrawableObject(floor);
 
 	glutTimerFunc(1, timer, 0);
 	glutMainLoop();
 
 	return 0;
-}
-
-void readMazeFile()
-{
-	fstream mazeFile;
-
-	mazeFile.open("C:\\maze2_unicursal.txt", fstream::in);
-
-	if (!mazeFile.is_open())
-	{
-		cerr << "Failed to open labyrinth-file!" << endl;
-		return;
-	}
-
-	int x = 0, y = 0, linelength = 0;
-	Vertex3D * position;
-	Box * box;
-
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-
-	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
-	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
-
-	while (mazeFile.good())
-	{
-		switch (char(mazeFile.get()))
-		{
-			// EOL -> define linelength and increase linenumber (y)
-			case '\n':
-			case '\r':
-				// do not increase linenumber for empty lines
-				if (x != 0)
-				{
-					linelength = x;
-					y++;
-					x = 0;
-				}
-				break;
-
-			case '#':
-				x++;
-				position = new Vertex3D(x, 0, y);
-				box = new Box(position, 1, boxTga);
-				box->generate();
-				Renderer::getInstance().addDrawableObject(box);
-				break;
-
-			case ' ':
-				x++;
-				break;
-
-			case -1:
-				continue;
-		}
-	}
-
-	mazeFile.close();
-
-	Plate * plate = new Plate(new Vertex3D(0, 0, 0), 70, sandTga);
-	plate->generate();
-	Renderer::getInstance().addDrawableObject(plate);
 }
 
 void display() 
@@ -189,22 +145,34 @@ void timer(int value)
 	{
 		if (keyboard.isDown('w')) 
 		{
-			camera.move(speed);
+			if (camera.canMove(speed * 2, maze))
+			{
+				camera.move(speed);
+			}
 		}
 
 		if (keyboard.isDown('s')) 
 		{
-			camera.move(-speed);
+			if (camera.canMove(-speed * 2, maze))
+			{
+				camera.move(-speed);
+			}
 		}
 
 		if (keyboard.isDown('a')) 
 		{
-			camera.strafe(speed);
+			if (camera.canStrafe(speed * 2, maze))
+			{
+				camera.strafe(speed);
+			}
 		}
 
 		if (keyboard.isDown('d')) 
 		{
-			camera.strafe(-speed);
+			if (camera.canStrafe(-speed * 2, maze))
+			{
+				camera.strafe(-speed);
+			}
 		}
 	}
 

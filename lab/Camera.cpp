@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <math.h>
-#include <GL/glut.h>
 #include "Camera.h"
+#include "Maze.h"
+#include <GL/glut.h>
 
 Camera::Camera()
 {
@@ -70,17 +71,57 @@ void Camera::getDirectionVector(float &x, float &y, float &z)
 	z = zDirectionVec;
 }
 
+bool Camera::canMove(float incr, Maze * maze)
+{
+	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
+	//float ly = sin(this->pitchAngle);
+	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
+
+	float xPosTmp = xPos + incr * lx;
+	//float yPosTmp = yPos + incr * ly;
+	float zPosTmp = zPos + incr * lz;
+
+	if (maze->at(xPosTmp, zPosTmp) == ' ')
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void Camera::move(float incr)
 {
 	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
-	float ly = sin(this->pitchAngle);
+	//float ly = sin(this->pitchAngle);
 	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
 
 	xPos = xPos + incr * lx;
-	yPos = yPos + incr * ly;
+	//yPos = yPos + incr * ly;
 	zPos = zPos + incr * lz;
 
 	this->refresh();
+}
+
+bool Camera::canStrafe(float incr, Maze * maze)
+{
+	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
+	//float ly = sin(this->pitchAngle);
+	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
+
+	float xPosTmp = xPos + incr * lx;
+	//float yPosTmp = yPos + incr * ly;
+	float zPosTmp = zPos + incr * lz;
+
+	if (maze->at(xPosTmp, zPosTmp) == ' ')
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Camera::strafe(float incr)
