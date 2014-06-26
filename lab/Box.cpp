@@ -22,6 +22,7 @@ void Box::generate()
 
 	texCoords = new TexCoords *[this->vertexCount];
 	vertices = new Vertex3D *[this->vertexCount];
+	normals = new Vertex3D *[this->vertexCount];
 
 	auto texCor1 = new TexCoords(0.0f, 0.0f);
 	auto texCor2 = new TexCoords(1, 0.0f);
@@ -55,16 +56,16 @@ void Box::generate()
 	vertices[11] = cornerH;
 
 	// back plate
-	vertices[12] = cornerD;
-	vertices[13] = cornerC;
-	vertices[14] = cornerG;
-	vertices[15] = cornerH;
+	vertices[12] = cornerC;
+	vertices[13] = cornerD;
+	vertices[14] = cornerH;
+	vertices[15] = cornerG;
 
 	// left plate
-	vertices[16] = cornerA;
-	vertices[17] = cornerD;
-	vertices[18] = cornerH;
-	vertices[19] = cornerE;
+	vertices[16] = cornerD;
+	vertices[17] = cornerA;
+	vertices[18] = cornerE;
+	vertices[19] = cornerH;
 
 	// right plate
 	vertices[20] = cornerB;

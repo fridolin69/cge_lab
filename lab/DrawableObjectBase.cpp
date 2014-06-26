@@ -21,8 +21,14 @@ DrawableObjectBase::DrawableObjectBase(Vertex3D* position, TgaTexture* texture)
 {
 	vertices = nullptr;
 	texCoords = nullptr;
+	normals = nullptr;
 	vertexCount = 0;
 	type = 0;
+}
+
+Vertex3D** DrawableObjectBase::getNormals()
+{
+	return this->normals;
 }
 
 TexCoords** DrawableObjectBase::getTexCoords()

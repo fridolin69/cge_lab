@@ -1,5 +1,6 @@
 #include "Util.h"
 #include <algorithm>
+#include "Vertex3D.h"
 
 
 Util::Util()

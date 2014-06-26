@@ -16,6 +16,7 @@ protected:
 	GLenum type;					// defines the type of geometry object the vertices should build, will be passed directly to glBegin()
 	Vertex3D * position;
 	Vertex3D ** vertices;
+	Vertex3D ** normals;
 
 	TexCoords ** texCoords;
 	TgaTexture * texture;
@@ -28,6 +29,7 @@ public:
 	virtual void generate() = 0;	// create the internal array returned at getVertices()
 
 	Vertex3D ** getVertices();		// returns the array of vertices
+	Vertex3D ** getNormals();
 
 	TgaTexture * getTexture();
 	TexCoords ** getTexCoords();
