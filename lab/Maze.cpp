@@ -24,20 +24,20 @@ char Maze::at(int x, int y)
 	return maze->at(y)->at(x);
 }
 
-void Maze::walk(function<void(int, int)> callback1, function<void(int, int)> callback2)
+void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback)
 {
-	for (int x = 0; x < width; ++x)
+	for (int x = 0; x < width; x++)
 	{
-		for (int y = 0; y < height; ++y)
+		for (int y = 0; y < height; y++)
 		{
-			if (maze->at(y)->at(x) == '#' && callback1 != nullptr)
+			if (maze->at(y)->at(x) == '#' && boxCallback != nullptr)
 			{
-				callback1(x, y);
+				boxCallback(x, y);
 			}
 
-			if (maze->at(y)->at(x) == ' ' && callback2 != nullptr)
+			if (maze->at(y)->at(x) == ' ' && pathCallback != nullptr)
 			{
-				callback2(x, y);
+				pathCallback(x, y);
 			}
 		}
 	}

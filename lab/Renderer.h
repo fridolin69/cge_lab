@@ -9,7 +9,8 @@
 class Renderer
 {
 private:
-	std::vector<DrawableObjectBase *> objects;
+	std::vector<GLuint> * displayLists;
+	std::vector<DrawableObjectBase *> * objects;
 
 private:
 	Renderer();
@@ -26,9 +27,10 @@ public:
 		return instance;
 	}
 
+	void createDisplayList(); // create new display list, draw all items, close display list and add to vector
 	void preRender();
 	void postRender();
-	void render(); // iterate over all objects and render them
+	void render(); // call all display lists
 
 	void addDrawableObject(DrawableObjectBase * object);
 };

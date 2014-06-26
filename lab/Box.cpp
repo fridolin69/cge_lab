@@ -24,9 +24,9 @@ void Box::generate()
 	vertices = new Vertex3D *[this->vertexCount];
 
 	auto texCor1 = new TexCoords(0.0f, 0.0f);
-	auto texCor2 = new TexCoords(size, 0.0f);
-	auto texCor3 = new TexCoords(size, size);
-	auto texCor4 = new TexCoords(0.0f, size);
+	auto texCor2 = new TexCoords(1, 0.0f);
+	auto texCor3 = new TexCoords(1, 1);
+	auto texCor4 = new TexCoords(0.0f, 1);
 
 	for (int i = 0; i < this->vertexCount; i = i + 4)
 	{

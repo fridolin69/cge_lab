@@ -19,7 +19,10 @@ TgaTexture * DrawableObjectBase::getTexture()
 DrawableObjectBase::DrawableObjectBase(Vertex3D* position, TgaTexture* texture)
 	: position(position), texture(texture)
 {
-	
+	vertices = nullptr;
+	texCoords = nullptr;
+	vertexCount = 0;
+	type = 0;
 }
 
 TexCoords** DrawableObjectBase::getTexCoords()

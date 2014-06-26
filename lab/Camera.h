@@ -45,7 +45,6 @@ public:
 	void disableFPSMode();
 	bool isFPSMode();
 
-	void init();
 	void refresh();
 	void setPos(float x, float y, float z);
 	void getPos(float &x, float &y, float &z);
@@ -56,10 +55,8 @@ public:
 	// Navigation
 	void move(float incr, std::function<bool(float, float)> predicate);
 	void strafe(float incr, std::function<bool(float, float)> predicate);
-	void fly(float incr);
 	void rotateYaw(float angle);
 	void rotatePitch(float angle);
-
 };
 
 #endif

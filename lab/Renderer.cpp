@@ -1,26 +1,20 @@
 #include "Renderer.h"
+#include <algorithm>
 
 Renderer::Renderer()
 {
-
+	objects = new std::vector<DrawableObjectBase*>();
+	displayLists = new std::vector<GLuint>();
 }
 
-Renderer::~Renderer()
+void ::Renderer::createDisplayList()
 {
+	GLuint index = glGenLists(1);
 
-}
+	glNewList(index, GL_COMPILE);
 
-void Renderer::addDrawableObject(DrawableObjectBase * object)
-{
-	this->objects.push_back(object);
-}
-
-void Renderer::render()
-{
-	for each (DrawableObjectBase * object in this->objects)
-	{
-		//glLoadIdentity();
-		glPushMatrix();
+		for_each(objects->begin(), objects->end(), [](DrawableObjectBase * object) -> void {
+			glPushMatrix();
 			glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -31,36 +25,62 @@ void Renderer::render()
 
 			glBegin(object->getObjectType()); // request object type
 
-				Vertex3D ** vertices = object->getVertices(); // request vertex-Array
-				TexCoords ** texCoords = object->getTexCoords();
+			Vertex3D ** vertices = object->getVertices(); // request vertex-Array
+			TexCoords ** texCoords = object->getTexCoords();
 
-				if (vertices == nullptr)
+			if (vertices == nullptr)
+			{
+				return;
+			}
+
+			// draw every vertex of the object
+			for (int i = 0; i < object->getVertexCount(); i++)
+			{
+				if (vertices[i] == nullptr) // prevent objects from crashing the render engine
 				{
 					continue;
 				}
 
-				// draw every vertex of the object
-				for (int i = 0; i < object->getVertexCount(); i++)
-				{
-					if (vertices[i] == nullptr) // prevent objects from crashing the render engine
-					{
-						continue;
-					}
-
-					glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
-					glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
-				}
+				glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
+				glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
+			}
 
 			glEnd();
 
-		glPopMatrix();
+			glPopMatrix();
+		});
+
+	glEndList();
+
+	objects->clear();
+	displayLists->push_back(index);
+}
+
+Renderer::~Renderer()
+{
+	
+}
+
+void Renderer::addDrawableObject(DrawableObjectBase * object)
+{
+	// lazy initialize object
+	if (object->getVertices() == nullptr)
+	{
+		object->generate();
 	}
+	objects->push_back(object);
+}
+
+void Renderer::render()
+{
+	for_each(displayLists->begin(), displayLists->end(), [](GLuint list) -> void {
+		glCallList(list);
+	});
 }
 
 void Renderer::preRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glLoadIdentity();
 }
 

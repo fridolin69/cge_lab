@@ -5,23 +5,17 @@
 
 Camera::Camera()
 {
-	this->init();
 	this->fpsMode = false;
-}
-
-Camera::~Camera()
-{
-	
-}
-
-void Camera::init()
-{
 	this->yawAngle = 0.0;
 	this->pitchAngle = 0.0;
 
 	this->setPos(0, 0, 0);
 }
 
+Camera::~Camera()
+{
+	
+}
 void Camera::refresh()
 {
 	// Camera parameter according to Riegl's co-ordinate system
@@ -72,57 +66,41 @@ void Camera::getDirectionVector(float &x, float &y, float &z)
 
 void Camera::move(float incr, std::function<bool(float, float)> predicate)
 {
-	float lx = cos(this->yawAngle) * cos(this->pitchAngle);
-	//float ly = sin(this->pitchAngle);
-	float lz = sin(this->yawAngle) * cos(this->pitchAngle);
+	float xIncr = incr *  cos(this->yawAngle) * cos(this->pitchAngle);
+	float zIncr = incr * sin(this->yawAngle) * cos(this->pitchAngle);
 
 	float oldX = xPos;
 	float oldZ = zPos;
 
-	float xPosTmp = xPos + incr * lx;
-
-	if (predicate(xPosTmp, oldZ))
+	if (predicate(xPos + 5 * xIncr, oldZ))
 	{
-		xPos = xPosTmp;
+		xPos += xIncr;
 	}
-
-	float zPosTmp = zPos + incr * lz;
-
-	if (predicate(oldX, zPosTmp))
+	if (predicate(oldX, zPos + 5 * zIncr))
 	{
-		zPos = zPosTmp;
+		zPos += zIncr;
 	}
-	
-	//yPos = yPos + incr * ly;
 
 	this->refresh();
 }
 
 void Camera::strafe(float incr, std::function<bool(float, float)> predicate)
 {
+	float xIncr = incr * this->xDirectionVecStrafe;
+	float zIncr = incr * this->zDirectionVecStrafe;
+
 	float oldX = xPos;
 	float oldZ = zPos;
 
-	float xPosTmp = this->xPos + incr * this->xDirectionVecStrafe;
-
-	if (predicate(xPosTmp, oldZ))
+	if (predicate(xPos + 5 * xIncr, oldZ))
 	{
-		xPos = xPosTmp;
+		xPos += xIncr;
+	}
+	if (predicate(oldX, zPos + 5 * zIncr))
+	{
+		zPos += zIncr;
 	}
 
-	float zPosTmp = this->zPos + incr * this->zDirectionVecStrafe;
-
-	if (predicate(oldX, zPosTmp))
-	{
-		zPos = zPosTmp;
-	}
-
-	this->refresh();
-}
-
-void Camera::fly(float incr)
-{
-	this->yPos =+ incr;
 	this->refresh();
 }
 
