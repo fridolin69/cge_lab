@@ -1,3 +1,4 @@
+#include "Util.h"
 #include "Box.h"
 
 
@@ -36,6 +37,20 @@ void Box::generate()
 		texCoords[i + 2] = texCor3;
 		texCoords[i + 3] = texCor4;
 	}
+
+	Vertex3D * normalBottom = Util::normal(cornerA, cornerB, cornerC, cornerD);
+	Vertex3D * normalFront = Util::normal(cornerA, cornerB, cornerF, cornerE);
+	Vertex3D * normalTop = Util::normal(cornerE, cornerF, cornerG, cornerH);
+	Vertex3D * normalBack = Util::normal(cornerC, cornerD, cornerH, cornerG);
+	Vertex3D * normalLeft = Util::normal(cornerD, cornerA, cornerE, cornerH);
+	Vertex3D * normalRight = Util::normal(cornerB, cornerC, cornerG, cornerF);
+
+	normals[0] = normals[1] = normals[2] = normals[3] = normalBottom;
+	normals[4] = normals[5] = normals[6] = normals[7] = normalFront;
+	normals[8] = normals[9] = normals[10] = normals[11] = normalTop;
+	normals[12] = normals[13] = normals[14] = normals[15] = normalBack;
+	normals[16] = normals[17] = normals[18] = normals[19] = normalLeft;
+	normals[20] = normals[21] = normals[22] = normals[23] = normalRight;
 
 	// bottom plate
 	vertices[0] = cornerA;
@@ -88,4 +103,5 @@ Box::~Box()
 
 	delete this->position;
 	delete this->vertices;
+	delete this->normals;
 }
