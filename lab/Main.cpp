@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "LightFactory.h"
 #include "Plate.h"
 #include "Maze.h"
 #include "Box.h"
@@ -70,15 +71,11 @@ int main(int argc, char **argv)
 		Box * box = new Box(position, 1, boxTga);
 		Renderer::getInstance().addDrawableObject(box);
 	},
-		nullptr);
-
-	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth() + 2, sandTga);
-	Renderer::getInstance().addDrawableObject(floor);
-
-	/*
-	Box * box = new Box(new Vertex3D(0, 0, 0), 1, boxTga);
-	Renderer::getInstance().addDrawableObject(box);
-	*/
+		[sandTga](int x, int y) -> void {
+		Vertex3D * position = new Vertex3D(x, 0, y);
+		Plate * floor = new Plate(position, 1, sandTga);
+		Renderer::getInstance().addDrawableObject(floor);
+	});
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
@@ -95,41 +92,24 @@ int main(int argc, char **argv)
 
 	glutIgnoreKeyRepeat(1);
 
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_COLOR_MATERIAL);
+	glShadeModel(GL_SMOOTH);
 
-	glShadeModel(GL_FLAT);
-
-	
-	GLfloat lightAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0 };
-	GLfloat lightDiffuse[] = { 1, 1, 1, 1.0 };
-
-	GLfloat material[] = { 1.0, 1.0, 1.0, 1.0 };
-
-	/*GLfloat lightShininess[] = { 128.0f };
-	GLfloat lightSpecular[] = { 0.8f, 0.8f, 0.8f, 1.0 };*/
-
-	/*glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT0, GL_SHININESS, lightShininess);*/
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material);
-
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 30); // angle is 0 to 180
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100); // exponent is 0 to 128
+	LightFactory::getInstance().initSpotlight(GL_LIGHT0);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.2f);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0);
+	Color * white = new Color(1, 1, 1);
+	GLfloat * material = white->toArray();
 
-	glEnable(GL_LIGHT0);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
+	glMaterialfv(GL_FRONT, GL_SHININESS, material);
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
 
 	glutMainLoop();
 	return 0;

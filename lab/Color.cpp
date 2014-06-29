@@ -35,3 +35,8 @@ GLfloat Color::getAlpha()
 {
 	return this->alpha;
 }
+
+GLfloat* Color::toArray()
+{
+	return new GLfloat[] { red, green, blue, alpha };
+}

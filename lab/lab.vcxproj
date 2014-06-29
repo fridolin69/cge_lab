@@ -82,6 +82,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DrawableObjectBase.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
+    <ClCompile Include="LightFactory.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Plate.cpp" />
     <ClCompile Include="TexCoords.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="Box.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="KeyboardInput.h" />
+    <ClInclude Include="LightFactory.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Plate.h" />
     <ClInclude Include="TexCoords.h" />

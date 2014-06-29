@@ -1,6 +1,8 @@
 #include "Camera.h"
+#include "LightFactory.h"
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 #include <GL/glut.h>
 
 Camera::Camera()
@@ -38,10 +40,8 @@ void Camera::refresh()
 				this->zPos + this->zDirectionVec,
 				0.0f, 1.0f, 0.0f);
 
-	GLfloat lightPosition[] = { xPos, yPos, zPos, 1.0 };
-	GLfloat lightDirection[] = { this->xDirectionVec, this->yDirectionVec, this->zDirectionVec };
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightDirection);
+	LightFactory::getInstance().setPosition(GL_LIGHT0, new Vertex3D(xPos, yPos, zPos));
+	LightFactory::getInstance().setDirection(GL_LIGHT0, new Vertex3D(xDirectionVec, yDirectionVec, zDirectionVec));
 
 	//printf("Camera: %f %f %f Direction vector: %f %f %f\n", xPos, yPos, zPos, xDirectionVec, yDirectionVec, zDirectionVec);
 }

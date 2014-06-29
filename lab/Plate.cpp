@@ -37,7 +37,6 @@ void Plate::generate()
 	texCoords[3] = new TexCoords(0.0f, size);
 
 	Vertex3D * normalBottom = Util::normal(cornerA, cornerB, cornerC, cornerD);
-	//Vertex3D * normalBottom = new Vertex3D(0, 1, 0);
 
 	// bottom plate
 	vertices[0] = cornerA;

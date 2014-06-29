@@ -1,5 +1,5 @@
-#include "Renderer.h"
 #include <algorithm>
+#include "Renderer.h"
 
 Renderer::Renderer()
 {
