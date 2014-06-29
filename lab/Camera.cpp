@@ -1,6 +1,6 @@
+#include "Camera.h"
 #include <stdio.h>
 #include <math.h>
-#include "Camera.h"
 #include <GL/glut.h>
 
 Camera::Camera()
@@ -29,7 +29,13 @@ void Camera::refresh()
 	this->zDirectionVecStrafe = sin(yawAngle - M_PI / 2);
 
 	glMatrixMode(GL_MODELVIEW);
+
 	glLoadIdentity();
+
+	GLfloat lightPosition[] = { xPos , yPos, zPos };
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+
 	gluLookAt(  this->xPos, 
 				this->yPos, 
 				this->zPos, 
@@ -80,8 +86,6 @@ void Camera::move(float incr, std::function<bool(float, float)> predicate)
 	{
 		zPos += zIncr;
 	}
-
-	this->refresh();
 }
 
 void Camera::strafe(float incr, std::function<bool(float, float)> predicate)
@@ -100,8 +104,6 @@ void Camera::strafe(float incr, std::function<bool(float, float)> predicate)
 	{
 		zPos += zIncr;
 	}
-
-	this->refresh();
 }
 
 void Camera::rotateYaw(float angle)

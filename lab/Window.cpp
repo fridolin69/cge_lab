@@ -35,7 +35,7 @@ void Window::resize(int newWidth, int newHeight)
 	glMatrixMode(GL_PROJECTION); //set the matrix to projection
 
 	glLoadIdentity();
-	gluPerspective(60, (GLfloat)this->width / (GLfloat)this->height, 0.1, 100.0); //set the perspective (angle of sight, width, height, depth)
+	gluPerspective(60, (GLfloat)this->width / (GLfloat)this->height, 0.1, 10.0); //set the perspective (angle of sight, width, height, depth)
 	glMatrixMode(GL_MODELVIEW); //set the matrix back to model
 }
 

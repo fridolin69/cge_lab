@@ -1,10 +1,10 @@
 #ifndef _DRAWABLE_OBJECT_H_
 #define _DRAWABLE_OBJECT_H_
 
-#include "Vertex3D.h"
 #include "Color.h"
 #include "TexCoords.h"
 #include "TgaTexture.h"
+#include "Vertex3D.h"
 
 // base class for any drawable object
 class DrawableObjectBase

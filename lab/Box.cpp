@@ -1,7 +1,6 @@
 #include "Util.h"
 #include "Box.h"
 
-
 Box::Box(Vertex3D* position, GLfloat size, TgaTexture* texture)
 	: DrawableObjectBase(position, texture), size(size)
 {

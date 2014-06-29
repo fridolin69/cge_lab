@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <cstdio>
 #include <iostream>
@@ -7,8 +6,6 @@
 #include <time.h>
 #include <vector>
 #include <algorithm>
-
-#include <GL\glut.h>
 
 #include "Plate.h"
 #include "Maze.h"
@@ -21,6 +18,7 @@
 #include "TgaTexture.h"
 #include "Util.h"
 
+#include <GL\glut.h>
 
 #define M_PI 3.1415
 #define MAX_FPS 60.0f
@@ -60,7 +58,7 @@ int main(int argc, char **argv)
 	window->create();
 
 	// read maze file
-	maze = new Maze("C:\\maze1_small.txt");
+	maze = new Maze("C:\\maze2_unicursal.txt");
 	maze->parse();
 
 	// load textures
@@ -83,8 +81,6 @@ int main(int argc, char **argv)
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
 
-	glutIgnoreKeyRepeat(1);
-
 	// register glut functions
 	glutDisplayFunc(display);
 	glutReshapeFunc(resize);
@@ -92,12 +88,32 @@ int main(int argc, char **argv)
 	glutPassiveMotionFunc(mouseMotion);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
+	glutIgnoreKeyRepeat(1);
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
 
+	GLfloat lightAmbient[] = {0.1f, 0.1f, 0.1f, 1.0 };
+	GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	GLfloat lightDiffuse[] = { 0.1f, 0.1f, 0.1f, 1.0 };
+	GLfloat lightAttenuation[] = { 0.9f, 0.9f, 0.9f, 1.0 };
+	GLfloat lightShininess[] = { 60.0f };
+
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	glLightfv(GL_LIGHT0, GL_SHININESS, lightShininess);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+
+	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lightAttenuation);
+	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, lightAttenuation);
+	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lightAttenuation);
+
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glShadeModel(GL_SMOOTH);
 
 	glutMainLoop();
 	return 0;

@@ -1,6 +1,6 @@
 #pragma once
-#include "Vertex3D.h"
 #include "DrawableObjectBase.h"
+#include "Vertex3D.h"
 
 class Plate : public DrawableObjectBase
 {

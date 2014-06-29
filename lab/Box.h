@@ -1,7 +1,6 @@
 #ifndef _BOX_H_
 #define _BOX_H_
 
-#include "Vertex3D.h"
 #include "DrawableObjectBase.h"
 
 class Box : public DrawableObjectBase

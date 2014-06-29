@@ -25,7 +25,8 @@ void ::Renderer::createDisplayList()
 
 			glBegin(object->getObjectType()); // request object type
 
-			Vertex3D ** vertices = object->getVertices(); // request vertex-Array
+			Vertex3D ** vertices = object->getVertices();
+			Vertex3D ** normals = object->getNormals();
 			TexCoords ** texCoords = object->getTexCoords();
 
 			if (vertices == nullptr)
@@ -41,6 +42,7 @@ void ::Renderer::createDisplayList()
 					continue;
 				}
 
+				glNormal3f(normals[i]->getX(), normals[i]->getY(), normals[i]->getZ());
 				glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
 				glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
 			}
