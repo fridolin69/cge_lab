@@ -29,13 +29,13 @@ void LightFactory::initSpotlight(GLuint lightIndex)
 	this->enable(lightIndex);
 
 	glLightf(lightIndex, GL_SPECULAR, 0.8f);
-	glLightf(lightIndex, GL_DIFFUSE, 0.2f);
+	glLightf(lightIndex, GL_DIFFUSE, 0.1f);
 	glLightf(lightIndex, GL_AMBIENT, 0.0f);
 
 	//glLightf(lightIndex, GL_SPOT_CUTOFF, 20); // angle is 0 to 180
 	glLightf(lightIndex, GL_SPOT_EXPONENT, 80); // exponent is 0 to 128
 
-	this->setAttenuation(lightIndex, 0.9f, 0.2f, 2);
+	this->setAttenuation(lightIndex, 1, 0, 3);
 }
 
 void LightFactory::setPosition(GLuint lightIndex, Vertex3D* position)

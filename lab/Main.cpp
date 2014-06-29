@@ -99,12 +99,15 @@ int main(int argc, char **argv)
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	Color * white = new Color(1, 1, 1);
+	Color * black = new Color(0, 0, 0);
 	GLfloat * material = white->toArray();
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
 	glMaterialfv(GL_FRONT, GL_SHININESS, material);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black->toArray());
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
