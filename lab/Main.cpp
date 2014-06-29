@@ -41,7 +41,6 @@ Window * window;
 Maze * maze;
 long lastRender;
 float translationUnit = 0.003;
-
 vector<long> * lastRenderDurations = new vector<long>(5);
 
 int main(int argc, char **argv) 
@@ -58,7 +57,7 @@ int main(int argc, char **argv)
 	window->create();
 
 	// read maze file
-	maze = new Maze("C:\\maze2_unicursal.txt");
+	maze = new Maze("C:\\maze1_small.txt");
 	maze->parse();
 
 	// load textures
@@ -73,10 +72,13 @@ int main(int argc, char **argv)
 	},
 		nullptr);
 
-
 	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth() + 2, sandTga);
-	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
+
+	/*
+	Box * box = new Box(new Vertex3D(0, 0, 0), 1, boxTga);
+	Renderer::getInstance().addDrawableObject(box);
+	*/
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
@@ -88,32 +90,46 @@ int main(int argc, char **argv)
 	glutPassiveMotionFunc(mouseMotion);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
-	glutIgnoreKeyRepeat(1);
-
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
 
-	GLfloat lightAmbient[] = {0.1f, 0.1f, 0.1f, 1.0 };
-	GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	GLfloat lightDiffuse[] = { 0.1f, 0.1f, 0.1f, 1.0 };
-	GLfloat lightAttenuation[] = { 0.9f, 0.9f, 0.9f, 1.0 };
-	GLfloat lightShininess[] = { 60.0f };
-
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT0, GL_SHININESS, lightShininess);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-
-	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lightAttenuation);
-	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, lightAttenuation);
-	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lightAttenuation);
+	glutIgnoreKeyRepeat(1);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
 
-	glShadeModel(GL_SMOOTH);
+	glShadeModel(GL_FLAT);
+
+	
+	GLfloat lightAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0 };
+	GLfloat lightDiffuse[] = { 1, 1, 1, 1.0 };
+
+	GLfloat material[] = { 1.0, 1.0, 1.0, 1.0 };
+
+	/*GLfloat lightShininess[] = { 128.0f };
+	GLfloat lightSpecular[] = { 0.8f, 0.8f, 0.8f, 1.0 };*/
+
+	/*glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	glLightfv(GL_LIGHT0, GL_SHININESS, lightShininess);*/
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material);
+
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 30); // angle is 0 to 180
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100); // exponent is 0 to 128
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 1);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.2f);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0);
+
+	glEnable(GL_LIGHT0);
 
 	glutMainLoop();
 	return 0;
@@ -124,12 +140,8 @@ void display()
 	Renderer &renderer = Renderer::getInstance();
 	Camera &camera = Camera::getInstance();
 
-	renderer.preRender();
-
 	camera.refresh();
 	renderer.render();
-
-	renderer.postRender();
 }
 
 void resize(int width, int height) {
@@ -226,7 +238,7 @@ bool canMoveTo(float x, float z)
 {
 	x = floor(x);
 	z = floor(z);
-	cout << "Checking access to " << x << " | " << z << endl;
+	//cout << "Checking access to " << x << " | " << z << endl;
 	return maze->at(x, z) == ' ';
 }
 

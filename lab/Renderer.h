@@ -28,8 +28,6 @@ public:
 	}
 
 	void createDisplayList(); // create new display list, draw all items, close display list and add to vector
-	void preRender();
-	void postRender();
 	void render(); // call all display lists
 
 	void addDrawableObject(DrawableObjectBase * object);

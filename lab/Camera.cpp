@@ -18,8 +18,6 @@ Camera::~Camera()
 }
 void Camera::refresh()
 {
-	// Camera parameter according to Riegl's co-ordinate system
-	// x/y for flat, z for height
 	this->xDirectionVec = cos(yawAngle) * cos(pitchAngle);
 	this->yDirectionVec = sin(pitchAngle);
 	this->zDirectionVec = sin(yawAngle) * cos(pitchAngle);
@@ -32,17 +30,18 @@ void Camera::refresh()
 
 	glLoadIdentity();
 
-	GLfloat lightPosition[] = { xPos , yPos, zPos };
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
-
 	gluLookAt(  this->xPos, 
 				this->yPos, 
 				this->zPos, 
 				this->xPos + this->xDirectionVec,
 				this->yPos + this->yDirectionVec,
 				this->zPos + this->zDirectionVec,
-				0.0, 1.0, 0.0);
+				0.0f, 1.0f, 0.0f);
+
+	GLfloat lightPosition[] = { xPos, yPos, zPos, 1.0 };
+	GLfloat lightDirection[] = { this->xDirectionVec, this->yDirectionVec, this->zDirectionVec };
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, lightDirection);
 
 	//printf("Camera: %f %f %f Direction vector: %f %f %f\n", xPos, yPos, zPos, xDirectionVec, yDirectionVec, zDirectionVec);
 }
