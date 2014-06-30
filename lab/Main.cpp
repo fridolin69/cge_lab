@@ -30,6 +30,7 @@
 #define MSEC_INPUT_TIMER 10
 
 #define CAMERA_Y 0.5f
+#define MENU int 0;
 
 using namespace std;
 
@@ -113,11 +114,12 @@ int main(int argc, char **argv)
 
 void loadLevel(int index)
 {
+
 	Renderer::getInstance().clear();
 
 	if (index == 0)
 	{
-		maze = new Maze("data/maze.txt");
+		maze = new Maze("data/menu.txt");
 	}
 	else if (index < 0)
 	{
@@ -209,6 +211,23 @@ void loadLevel(int index)
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
+	const char * c;
+	std::string s;
+	if (index > 0 )
+	{
+		std::stringstream ss;
+		ss << "LabRob, Level: " << index;
+		s = ss.str();
+		c  = s.c_str();
+	} else
+	{
+		c = "LabRob Menu";
+	}
+
+	
+	
+	cout << c << endl;
+	glutSetWindowTitle(c);
 }
 
 void display() 
