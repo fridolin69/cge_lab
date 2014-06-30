@@ -29,7 +29,7 @@
 #define MAX_FPS 60.0f
 #define MSEC_DISPLAY_TIMER (1000.0f / MAX_FPS)
 #define MSEC_INPUT_TIMER 10
-
+#define MSEC_CHECK_FOR_EXIT 2000
 #define CAMERA_Y 0.5f
 #define MENU int 0;
 
@@ -42,10 +42,12 @@ void keyUp(unsigned char key, int x, int y);
 void mouseMotion(int x, int y);
 void inputTimer(int value);
 void displayTimer(int value);
+void onExitPlateTimer(int value);
 void reportGLError(const char * msg);
 void loadLevelIfOnCorrectPos(float x, float z);
 bool canMoveTo(float x, float z);
 void loadLevel(int index);
+void checkforExit(float x, float z);
 
 Window * window = nullptr;
 Maze * maze = nullptr;
@@ -56,10 +58,11 @@ vector<long> * lastRenderDurations = new vector<long>(5);
 std::map<int, int> levelindex;
 std::map<int, bool> leveldone;
 
-int main(int argc, char **argv) 
-{
-	leveldone[1] = true; //TODO gehört wieder raus :) bzw in die neue timerfunc :)
+//bool inMenu = true;
+int activeLevel = 0;
 
+int main(int argc, char **argv)
+{
 	glutInit(&argc, argv);
 
 	// set up camera
@@ -80,12 +83,13 @@ int main(int argc, char **argv)
 	glutKeyboardUpFunc(keyUp);
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
 
 	glutIgnoreKeyRepeat(1);
 
 	loadLevel(0);
 
-	
+
 
 	glShadeModel(GL_SMOOTH);
 
@@ -129,7 +133,8 @@ void loadLevel(int index)
 	else if (index < 0)
 	{
 		throw new exception("Index must be greater than 0");
-	} else
+	}
+	else
 	{
 		string pathPrefix = "data/maze";
 		stringstream path;
@@ -161,77 +166,83 @@ void loadLevel(int index)
 		Renderer::getInstance().addDrawableObject(floor);
 	}
 		,
-		[launchTga,redstoneTga,greenstoneTga](int x, int z, int level, char field) -> void
+		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void
 	{
 		if (field == 'x')
 		{
-				Coord3D * position = new Coord3D(x, 0, z);
-				Box * box;
+			Coord3D * position = new Coord3D(x, 0, z);
+			Box * box;
 
-				//cout << "x found: levelindex: " << levelindex[z] << endl;
-				//cout << "level done? " << leveldone[levelindex[z]] <<endl;
-				if (leveldone[levelindex[z]] == true)
-				{
-					box = new Box(position, 0.3, 1, greenstoneTga);
-				} else
-				{
-					box = new Box(position, 0.3, 1, redstoneTga);
-				}
+			//cout << "x found: levelindex: " << levelindex[z] << endl;
+			//cout << "level done? " << leveldone[levelindex[z]] <<endl;
+			if (leveldone[levelindex[z]] == true)
+			{
+				box = new Box(position, 0.3, 1, greenstoneTga);
+			}
+			else
+			{
+				box = new Box(position, 0.3, 1, redstoneTga);
+			}
 			Renderer::getInstance().addDrawableObject(box);
 		}
 		else if (field == 's')
 		{
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-				floor->generate();
-				Renderer::getInstance().addDrawableObject(floor);
-				//cout << "pushing level"<< level << " to index: " << z << endl;
-				levelindex[z] = level;
-			}
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+			floor->generate();
+			Renderer::getInstance().addDrawableObject(floor);
+			//cout << "pushing level"<< level << " to index: " << z << endl;
+			levelindex[z] = level;
+		}
 
-		},
-		[launchTga, redstoneTga](int x, int z, char field) -> void
+	},
+		[launchTga, sandTga](int x, int z, char field) -> void
+	{
+
+		if (field == 'E')
 		{
-
-			if (field == 'E')
-			{
-				Camera &camera = Camera::getInstance();
-				camera.setPos(x+0.5, CAMERA_Y, z +0.5);
-				camera.setYaw(240.0f);
+			Camera &camera = Camera::getInstance();
+			camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
+			camera.setYaw(240.0f);
+			
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
+			floor->generate();
+			Renderer::getInstance().addDrawableObject(floor);
 
 		}
-			else if (field == 'A')
-			{
+		else if (field == 'A')
+		{
 
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z),1, 1, launchTga);
-				floor->generate();
-				Renderer::getInstance().addDrawableObject(floor);
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+			floor->generate();
+			Renderer::getInstance().addDrawableObject(floor);
 
-	}
+		}
 
-		});
+	});
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
 	const char * c;
 	std::string s;
-	if (index > 0 )
+	if (index > 0)
 	{
 		std::stringstream ss;
 		ss << "LabRob, Level: " << index;
 		s = ss.str();
-		c  = s.c_str();
-	} else
+		c = s.c_str();
+	}
+	else
 	{
 		c = "LabRob Menu";
 	}
+	activeLevel = index;
 
-	
-	
+
 	cout << c << endl;
 	glutSetWindowTitle(c);
 }
 
-void display() 
+void display()
 {
 	Renderer &renderer = Renderer::getInstance();
 	Camera &camera = Camera::getInstance();
@@ -249,20 +260,20 @@ void keyDown(unsigned char key, int x, int y)
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
 	Camera &camera = Camera::getInstance();
 
-	if (key == ' ') 
+	if (key == ' ')
 	{
 		switch (camera.isFPSMode())
 		{
-			case true:
-				glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
-				camera.disableFPSMode();
-				break;
+		case true:
+			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+			camera.disableFPSMode();
+			break;
 
-			case false:
-				glutSetCursor(GLUT_CURSOR_NONE);
-				glutWarpPointer(window->getWidth() / 2, window->getHeight() / 2);
-				camera.enableFPSMode();
-				break;
+		case false:
+			glutSetCursor(GLUT_CURSOR_NONE);
+			glutWarpPointer(window->getWidth() / 2, window->getHeight() / 2);
+			camera.enableFPSMode();
+			break;
 		}
 	}
 
@@ -299,29 +310,29 @@ void inputTimer(int value)
 	Camera &camera = Camera::getInstance();
 	float speed = camera.getTranslationSpeed();
 
-	if (camera.isFPSMode()) 
+	if (camera.isFPSMode())
 	{
 		if ((keyboard.isDown('w') || keyboard.isDown('s')) && (keyboard.isDown('a') || (keyboard.isDown('d'))))
 		{
 			speed *= 0.707;
 		}
 
-		if (keyboard.isDown('w')) 
+		if (keyboard.isDown('w'))
 		{
 			camera.move(speed, canMoveTo);
 		}
 
-		if (keyboard.isDown('s')) 
+		if (keyboard.isDown('s'))
 		{
 			camera.move(-speed, canMoveTo);
 		}
 
-		if (keyboard.isDown('a')) 
+		if (keyboard.isDown('a'))
 		{
 			camera.strafe(speed, canMoveTo);
 		}
 
-		if (keyboard.isDown('d')) 
+		if (keyboard.isDown('d'))
 		{
 			camera.strafe(-speed, canMoveTo);
 		}
@@ -329,29 +340,59 @@ void inputTimer(int value)
 		if (keyboard.isDown('e')) //start level 
 		{
 			camera.getPosPtr(loadLevelIfOnCorrectPos);
-	}
+		}
 	}
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 }
+
+
+
+
+void onExitPlateTimer(int value)
+{
+	KeyboardInput &keyboard = KeyboardInput::getInstance();
+	Camera &camera = Camera::getInstance();
+	camera.getPosPtr(checkforExit);
+
+
+	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
+}
+
+void checkforExit(float x, float z)
+{
+	cout << "check for exit:  "<<endl;
+	if (maze->at(x, z) == 'A' && activeLevel != 0)
+	{
+		cout << "Congrats you found the exit";
+		leveldone[activeLevel] = true;
+		loadLevel(0);
+	}
+}
+
+
+
 
 void loadLevelIfOnCorrectPos(float x, float z)
 {
 
 	int floorZ = floorf(z);
 
-	cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
-	cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
+	//cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
+	//cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
 
-	loadLevel(1);
-	if (floorZ > 0)
+	if (activeLevel == 0)
 	{
-		int level = levelindex[floorZ];
-		cout << "load level: " << level << endl;
-	
-		loadLevel(level);
+		if (levelindex[floorZ] != activeLevel)
+		{
+			int level = levelindex[floorZ];
+			cout << "load level: " << level << endl;
+
+			loadLevel(level);
+		}
+
 	}
-	
+
 }
 
 bool canMoveTo(float x, float z)
@@ -362,7 +403,7 @@ bool canMoveTo(float x, float z)
 	//TODO
 	/*if (maze->at(x, z) == ' ')
 	{
-		return true;
+	return true;
 	}*/
 	if (maze->at(x, z) == '#' || maze->at(x, z) == 'x')
 	{
@@ -391,12 +432,12 @@ void mouseMotion(int x, int y)
 		int deltaX = x - window->getWidth() / 2;
 		int deltaY = y - window->getHeight() / 2;
 
-		if (deltaX != 0) 
+		if (deltaX != 0)
 		{
 			camera.rotateYaw(speed * deltaX);
 		}
 
-		if (deltaY != 0) 
+		if (deltaY != 0)
 		{
 			camera.rotatePitch(speed * deltaY);
 		}
