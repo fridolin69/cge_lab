@@ -63,6 +63,7 @@ int activeLevel = 0;
 
 int main(int argc, char **argv) 
 {
+
 	glutInit(&argc, argv);
 
 	// set up camera
@@ -71,8 +72,9 @@ int main(int argc, char **argv)
 	camera.setPos(-2, CAMERA_Y, -2);
 
 	// set up window
-	window = new Window(1680, 1050, "Lab Display");
+	window = new Window(800, 768, "Lab Display");
 	window->create();
+
 
 	// register glut functions
 	glutDisplayFunc(display);
@@ -110,10 +112,9 @@ int main(int argc, char **argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
-
-	//glutFullScreen();
+	glutFullScreen();
 	glutMainLoop();
-
+	
 	return 0;
 }
 
@@ -151,52 +152,64 @@ void loadLevel(int index)
 	TgaTexture * launchTga = new TgaTexture("data/launch_DIFFUSE.tga", GL_CLAMP);
 	TgaTexture * redstoneTga = new TgaTexture("data/kt_stone_2.tga", GL_CLAMP);
 	TgaTexture * greenstoneTga = new TgaTexture("data/kt_rock_1f_rot_shiny.tga", GL_CLAMP);
-
 	// generate maze
 	maze->walk(
-		[boxTga](int x, int y) -> void {
+
+		[boxTga](int x, int y) -> void
+	{
 		Coord3D * position = new Coord3D(x, 0, y);
 		Box * box = new Box(position, 1, boxTga);
 		Renderer::getInstance().addDrawableObject(box);
-	},
-		[sandTga](int x, int y) -> void {
+	}
+		,
+		[sandTga](int x, int y) -> void
+	{
 		Coord3D * position = new Coord3D(x, 0, y);
 		Plate * floor = new Plate(position, 1, 1, sandTga);
 		Renderer::getInstance().addDrawableObject(floor);
-	},
-		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void {
+	}
+		,
+		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void
+	{
 		if (field == 'x')
 		{
-			Coord3D * position = new Coord3D(x, 0, z);
-			TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
+				Coord3D * position = new Coord3D(x, 0, z);
+				TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
 
-			Box * box = new Box(position, 0.3, 1, texture);
-			Renderer::getInstance().addDrawableObject(box);
+				Box * box = new Box(position, 0.3, 1, texture);
+				Renderer::getInstance().addDrawableObject(box);
 		}
 		else if (field == 's')
 		{
-			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-			Renderer::getInstance().addDrawableObject(floor);
-			levelindex[z] = level;
-		}
-	},
-		[launchTga, redstoneTga, sandTga](int x, int z, char field) -> void {
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+				Renderer::getInstance().addDrawableObject(floor);
+				levelindex[z] = level;
+			}
+		},
+		[launchTga, sandTga](int x, int z, char field) -> void
+	{
 
-		if (field == 'E')
-		{
-			Camera &camera = Camera::getInstance();
-			camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
-			camera.setYaw(240.0f);
+			if (field == 'E')
+			{
+				Camera &camera = Camera::getInstance();
+				camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
+				camera.setYaw(240.0f);
 
-			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
-			Renderer::getInstance().addDrawableObject(floor);
-		}
-		else if (field == 'A')
-		{
-			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-			Renderer::getInstance().addDrawableObject(floor);
-		}
-	});
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
+			floor->generate();
+				Renderer::getInstance().addDrawableObject(floor);
+
+			}
+			else if (field == 'A')
+			{
+
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+			floor->generate();
+				Renderer::getInstance().addDrawableObject(floor);
+
+			}
+
+		});
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
@@ -213,7 +226,7 @@ void loadLevel(int index)
 	else
 	{
 		c = "LabRob Menu";
-	}
+}
 	activeLevel = index;
 
 
@@ -236,6 +249,24 @@ void resize(int width, int height) {
 
 void keyDown(unsigned char key, int x, int y)
 {
+
+	if (key == 27) //ESCape
+	{
+		if (activeLevel == 0)
+		{
+			cout << "escape" << endl;
+			glutDestroyWindow(window->getWindowNr());
+			exit(0);
+		}
+		else
+		{
+			loadLevel(0);
+		}
+
+	}
+
+
+
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
 	Camera &camera = Camera::getInstance();
 

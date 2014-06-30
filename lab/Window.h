@@ -9,6 +9,7 @@ private:
 	int width;
 	int height;
 	std::string title;
+	int windowNr;
 
 public:
 	Window(std::string title);
@@ -20,6 +21,7 @@ public:
 
 	int getWidth();
 	int getHeight();
+	int getWindowNr();
 };
 
 #endif
