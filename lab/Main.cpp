@@ -75,6 +75,7 @@ int main(int argc, char **argv)
 	window = new Window(800, 768, "Lab Display");
 	window->create();
 
+
 	// register glut functions
 	glutDisplayFunc(display);
 	glutReshapeFunc(resize);
@@ -111,8 +112,9 @@ int main(int argc, char **argv)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
-
+	glutFullScreen();
 	glutMainLoop();
+	
 	return 0;
 }
 
