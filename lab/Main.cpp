@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	// set up camera
 	Camera &camera = Camera::getInstance();
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
-	camera.setPosition(-2, 0.5f, -2);
+	camera.setPos(-2, 0.5f, -2);
 
 	// set up window
 	window = new Window(1680, 1050, "Lab Display");
