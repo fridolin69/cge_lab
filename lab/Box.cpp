@@ -33,10 +33,10 @@ void Box::generate()
 	vertices =  new Vertex3D  *[this->vertexCount];
 	normals =   new Vertex3D  *[this->vertexCount];
 
-	auto texCor1 = new TexCoords(0.0f, 0.0f);
-	auto texCor2 = new TexCoords(1, 0.0f);
+	auto texCor1 = new TexCoords(0, 0);
+	auto texCor2 = new TexCoords(1, 0);
 	auto texCor3 = new TexCoords(1, 1);
-	auto texCor4 = new TexCoords(0.0f, 1);
+	auto texCor4 = new TexCoords(0, 1);
 
 	for (int i = 0; i < this->vertexCount; i = i + 4)
 	{

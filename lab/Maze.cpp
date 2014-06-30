@@ -148,6 +148,8 @@ void Maze::parse()
 	height = y;
 
 	mazeFile.close();
+
+	this->parsed = true;
 }
 
 Maze::~Maze()

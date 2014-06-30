@@ -1,4 +1,5 @@
 #include "Util.h"
+#include <iostream>
 #include "Plate.h"
 
 Plate::Plate(Vertex3D* position, GLfloat zWidth, GLfloat size, TgaTexture* texture)
@@ -45,4 +46,6 @@ void Plate::generate()
 	vertices[3] = cornerD;
 
 	normals[0] = normals[1] = normals[2] = normals[3] = normalBottom;
+
+	//std::cout << "plate: " << normals[0]->getX() << "|" << normals[0]->getY() << "|" << normals[0]->getZ() << "|" << std::endl;
 }

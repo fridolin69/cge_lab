@@ -22,6 +22,8 @@ public:
 	GLfloat getGreen();
 	GLfloat getBlue();
 	GLfloat getAlpha();
+
+	GLfloat * toArray();
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "LightFactory.h"
 #include "Plate.h"
 #include "Maze.h"
 #include "Box.h"
@@ -41,7 +42,6 @@ Window * window;
 Maze * maze;
 long lastRender;
 float translationUnit = 0.003;
-
 vector<long> * lastRenderDurations = new vector<long>(5);
 
 int main(int argc, char **argv) 
@@ -73,9 +73,9 @@ int main(int argc, char **argv)
 		
 		[boxTga](int x, int y) -> void 
 		{
-			Vertex3D * position = new Vertex3D(x, 0, y);
-			Box * box = new Box(position, 1, boxTga);
-			Renderer::getInstance().addDrawableObject(box);
+		Vertex3D * position = new Vertex3D(x, 0, y);
+		Box * box = new Box(position, 1, boxTga);
+		Renderer::getInstance().addDrawableObject(box);
 		}
 		,
 		nullptr
@@ -114,32 +114,32 @@ int main(int argc, char **argv)
 	glutPassiveMotionFunc(mouseMotion);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
-	glutIgnoreKeyRepeat(1);
-
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
 
-	GLfloat lightAmbient[] = {0.1f, 0.1f, 0.1f, 1.0 };
-	GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	GLfloat lightDiffuse[] = { 0.1f, 0.1f, 0.1f, 1.0 };
-	GLfloat lightAttenuation[] = { 0.9f, 0.9f, 0.9f, 1.0 };
-	GLfloat lightShininess[] = { 60.0f };
+	glutIgnoreKeyRepeat(1);
 
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glLightfv(GL_LIGHT0, GL_SHININESS, lightShininess);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	glShadeModel(GL_SMOOTH);
 
-	glLightfv(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lightAttenuation);
-	glLightfv(GL_LIGHT0, GL_LINEAR_ATTENUATION, lightAttenuation);
-	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lightAttenuation);
+	LightFactory::getInstance().initSpotlight(GL_LIGHT0);
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	Color * white = new Color(1, 1, 1);
+	Color * black = new Color(0, 0, 0);
+	GLfloat * material = white->toArray();
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
+	glMaterialfv(GL_FRONT, GL_SHININESS, material);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black->toArray());
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-	glShadeModel(GL_SMOOTH);
+	glEnable(GL_COLOR_MATERIAL);
 
 	glutMainLoop();
 	return 0;
@@ -150,12 +150,8 @@ void display()
 	Renderer &renderer = Renderer::getInstance();
 	Camera &camera = Camera::getInstance();
 
-	renderer.preRender();
-
 	camera.refresh();
 	renderer.render();
-
-	renderer.postRender();
 }
 
 void resize(int width, int height) {

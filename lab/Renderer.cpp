@@ -1,5 +1,5 @@
-#include "Renderer.h"
 #include <algorithm>
+#include "Renderer.h"
 
 Renderer::Renderer()
 {
@@ -15,39 +15,37 @@ void ::Renderer::createDisplayList()
 
 		for_each(objects->begin(), objects->end(), [](DrawableObjectBase * object) -> void {
 			glPushMatrix();
-			glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
+				glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
 
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+				glBindTexture(GL_TEXTURE_2D, object->getTexture()->getTextureId());
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, object->getTexture()->getWrapMode());
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, object->getTexture()->getWrapMode());
 
-			glBindTexture(GL_TEXTURE_2D, object->getTexture()->getTextureId());
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, object->getTexture()->getWrapMode());
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, object->getTexture()->getWrapMode());
+				glBegin(object->getObjectType()); // request object type
 
-			glBegin(object->getObjectType()); // request object type
+					Vertex3D ** vertices = object->getVertices();
+					Vertex3D ** normals = object->getNormals();
+					TexCoords ** texCoords = object->getTexCoords();
 
-			Vertex3D ** vertices = object->getVertices();
-			Vertex3D ** normals = object->getNormals();
-			TexCoords ** texCoords = object->getTexCoords();
+					if (vertices == nullptr)
+					{
+						return;
+					}
 
-			if (vertices == nullptr)
-			{
-				return;
-			}
+					// draw every vertex of the object
+					for (int i = 0; i < object->getVertexCount(); i++)
+					{
+						if (vertices[i] == nullptr) // prevent objects from crashing the render engine
+						{
+							continue;
+						}
 
-			// draw every vertex of the object
-			for (int i = 0; i < object->getVertexCount(); i++)
-			{
-				if (vertices[i] == nullptr) // prevent objects from crashing the render engine
-				{
-					continue;
-				}
+						glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
+						glNormal3f(normals[i]->getX(), normals[i]->getY(), normals[i]->getZ());
+						glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
+					}
 
-				glNormal3f(normals[i]->getX(), normals[i]->getY(), normals[i]->getZ());
-				glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
-				glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
-			}
-
-			glEnd();
+				glEnd();
 
 			glPopMatrix();
 		});
@@ -75,18 +73,11 @@ void Renderer::addDrawableObject(DrawableObjectBase * object)
 
 void Renderer::render()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	for_each(displayLists->begin(), displayLists->end(), [](GLuint list) -> void {
 		glCallList(list);
 	});
-}
 
-void Renderer::preRender()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-}
-
-void Renderer::postRender()
-{
 	glutSwapBuffers();
 }
