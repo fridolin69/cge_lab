@@ -203,7 +203,7 @@ void loadLevel(int index)
 			Camera &camera = Camera::getInstance();
 			camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
 			camera.setYaw(240.0f);
-			
+
 			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
 			floor->generate();
 			Renderer::getInstance().addDrawableObject(floor);
@@ -257,6 +257,24 @@ void resize(int width, int height) {
 
 void keyDown(unsigned char key, int x, int y)
 {
+
+	if (key == 27) //ESCape
+	{
+		if (activeLevel == 0)
+		{
+			cout << "escape" << endl;
+			glutDestroyWindow(window->getWindowNr());
+			exit(0);
+		}
+		else
+		{
+			loadLevel(0);
+		}
+
+	}
+
+
+
 	KeyboardInput &keyboard = KeyboardInput::getInstance();
 	Camera &camera = Camera::getInstance();
 
@@ -361,7 +379,7 @@ void onExitPlateTimer(int value)
 
 void checkforExit(float x, float z)
 {
-	cout << "check for exit:  "<<endl;
+	cout << "check for exit:  " << endl;
 	if (maze->at(x, z) == 'A' && activeLevel != 0)
 	{
 		cout << "Congrats you found the exit";

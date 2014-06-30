@@ -23,7 +23,7 @@ void Window::create()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(this->width, this->height);
-	glutCreateWindow(this->title.c_str());
+	this->windowNr = glutCreateWindow(this->title.c_str());
 }
 
 void Window::resize(int newWidth, int newHeight)
@@ -47,4 +47,9 @@ int Window::getHeight()
 int Window::getWidth()
 {
 	return this->width;
+}
+
+int Window::getWindowNr()
+{
+	return this->windowNr;
 }
