@@ -29,8 +29,9 @@
 #define MAX_FPS 60.0f
 #define MSEC_DISPLAY_TIMER (1000.0f / MAX_FPS)
 #define MSEC_INPUT_TIMER 10
-
+#define MSEC_CHECK_FOR_EXIT 2000
 #define CAMERA_Y 0.5f
+#define MENU int 0;
 
 using namespace std;
 
@@ -41,10 +42,12 @@ void keyUp(unsigned char key, int x, int y);
 void mouseMotion(int x, int y);
 void inputTimer(int value);
 void displayTimer(int value);
+void onExitPlateTimer(int value);
 void reportGLError(const char * msg);
 void loadLevelIfOnCorrectPos(float x, float z);
 bool canMoveTo(float x, float z);
 void loadLevel(int index);
+void checkforExit(float x, float z);
 
 Window * window = nullptr;
 Maze * maze = nullptr;
@@ -55,10 +58,11 @@ vector<long> * lastRenderDurations = new vector<long>(5);
 map<int, int> levelindex;
 map<int, bool> leveldone;
 
+//bool inMenu = true;
+int activeLevel = 0;
+
 int main(int argc, char **argv) 
 {
-	leveldone[1] = true; //TODO gehört wieder raus :) bzw in die neue timerfunc :)
-
 	glutInit(&argc, argv);
 
 	// set up camera
@@ -79,6 +83,7 @@ int main(int argc, char **argv)
 	glutKeyboardUpFunc(keyUp);
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
 
 	glutIgnoreKeyRepeat(1);
 
@@ -113,6 +118,7 @@ int main(int argc, char **argv)
 
 void loadLevel(int index)
 {
+
 	Renderer::getInstance().clear();
 
 	if (maze != nullptr)
@@ -120,12 +126,12 @@ void loadLevel(int index)
 
 	if (index == 0)
 	{
-		maze = new Maze("data/maze.txt");
+		maze = new Maze("data/menu.txt");
 	}
 	else if (index < 0)
 	{
 		throw new exception("Index must be greater than 0");
-	} 
+	}
 	else
 	{
 		string pathPrefix = "data/maze";
@@ -145,48 +151,69 @@ void loadLevel(int index)
 	// generate maze
 	maze->walk(
 		[boxTga](int x, int y) -> void {
-			Coord3D * position = new Coord3D(x, 0, y);
-			Box * box = new Box(position, 1, boxTga);
-			Renderer::getInstance().addDrawableObject(box);
+		Coord3D * position = new Coord3D(x, 0, y);
+		Box * box = new Box(position, 1, boxTga);
+		Renderer::getInstance().addDrawableObject(box);
 		},
 		[sandTga](int x, int y) -> void {
-			Coord3D * position = new Coord3D(x, 0, y);
-			Plate * floor = new Plate(position, 1, 1, sandTga);
-			Renderer::getInstance().addDrawableObject(floor);
+		Coord3D * position = new Coord3D(x, 0, y);
+		Plate * floor = new Plate(position, 1, 1, sandTga);
+		Renderer::getInstance().addDrawableObject(floor);
 		},
 		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void {
-			if (field == 'x')
-			{
+		if (field == 'x')
+		{
 				Coord3D * position = new Coord3D(x, 0, z);
 				TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
 
 				Box * box = new Box(position, 0.3, 1, texture);
 				Renderer::getInstance().addDrawableObject(box);
-			}
-			else if (field == 's')
-			{
+		}
+		else if (field == 's')
+		{
 				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
 				Renderer::getInstance().addDrawableObject(floor);
 				levelindex[z] = level;
 			}
 		},
-		[launchTga, redstoneTga](int x, int z, char field) -> void {
+			[launchTga, redstoneTga, sandTga](int x, int z, char field) -> void {
 
 			if (field == 'E')
 			{
 				Camera &camera = Camera::getInstance();
-				camera.setPos(x+0.5, CAMERA_Y, z +0.5);
+				camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
 				camera.setYaw(240.0f);
 
-			} else if (field == 'A') 
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
+				Renderer::getInstance().addDrawableObject(floor);
+			}
+			else if (field == 'A')
 			{
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z),1, 1, launchTga);
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
 				Renderer::getInstance().addDrawableObject(floor);
 			}
 		});
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
+	const char * c;
+	std::string s;
+	if (index > 0)
+	{
+		std::stringstream ss;
+		ss << "LabRob, Level: " << index;
+		s = ss.str();
+		c = s.c_str();
+	}
+	else
+	{
+		c = "LabRob Menu";
+}
+	activeLevel = index;
+
+
+	cout << c << endl;
+	glutSetWindowTitle(c);
 }
 
 void display() 
@@ -286,25 +313,56 @@ void inputTimer(int value)
 		if (keyboard.isDown('e')) //start level 
 		{
 			camera.getPosPtr(loadLevelIfOnCorrectPos);
-		}
+	}
 	}
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
 }
 
+
+
+
+void onExitPlateTimer(int value)
+{
+	KeyboardInput &keyboard = KeyboardInput::getInstance();
+	Camera &camera = Camera::getInstance();
+	camera.getPosPtr(checkforExit);
+
+
+	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
+}
+
+void checkforExit(float x, float z)
+{
+	cout << "check for exit:  "<<endl;
+	if (maze->at(x, z) == 'A' && activeLevel != 0)
+	{
+		cout << "Congrats you found the exit";
+		leveldone[activeLevel] = true;
+		loadLevel(0);
+	}
+}
+
+
+
+
 void loadLevelIfOnCorrectPos(float x, float z)
 {
 	int floorZ = floorf(z);
 
-	cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
-	cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
+	//cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
+	//cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
 
-	if (floorZ > 0)
+	if (activeLevel == 0)
+	{
+		if (levelindex[floorZ] != activeLevel)
 	{
 		int level = levelindex[floorZ];
 		cout << "load level: " << level << endl;
 		loadLevel(level);
 	}
+}
+
 }
 
 bool canMoveTo(float x, float z)

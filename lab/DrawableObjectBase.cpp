@@ -51,7 +51,7 @@ DrawableObjectBase::~DrawableObjectBase()
 
 	if (texture != nullptr)
 	{
-		//delete texture;
+		delete texture;
 		texture = nullptr;
 	}
 }
