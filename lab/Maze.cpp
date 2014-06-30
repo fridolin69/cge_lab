@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Maze::Maze(char* path) : path(path)
+Maze::Maze(string path) : path(path)
 {
 	parsed = false;
 }
@@ -46,11 +46,11 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 			{
 				launchCallback(x, y, -1, 's');
 			}
+
 			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)//found new level entry
 			{
 				launchCallback(x, y, ++levelnumber,'x');
 			}
-
 
 			else if (maze->at(y)->at(x) == '#' && boxCallback != nullptr)
 			{

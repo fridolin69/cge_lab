@@ -29,6 +29,7 @@ public:
 
 	void createDisplayList(); // create new display list, draw all items, close display list and add to vector
 	void render(); // call all display lists
+	void clear();
 
 	void addDrawableObject(DrawableObjectBase * object);
 };

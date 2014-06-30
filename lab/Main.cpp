@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <sstream>
 #include <time.h>
 #include <vector>
 #include <algorithm>
@@ -37,6 +38,7 @@ void inputTimer(int value);
 void displayTimer(int value);
 void reportGLError(const char * msg);
 bool canMoveTo(float x, float z);
+void loadLevel(int index);
 
 Window * window;
 Maze * maze;
@@ -51,61 +53,11 @@ int main(int argc, char **argv)
 	// set up camera
 	Camera &camera = Camera::getInstance();
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
-	camera.setPos(-2, 0.5f, -2);
+	camera.setPosition(-2, 0.5f, -2);
 
 	// set up window
-	window = new Window(800, 768, "Lab Display");
+	window = new Window(1680, 1050, "Lab Display");
 	window->create();
-
-	// read maze file
-	maze = new Maze("C:\\maze.txt");
-	maze->parse();
-
-	// load textures
-	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
-	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
-
-	TgaTexture * launchTga = new TgaTexture("C:\\launch_DIFFUSE.tga", GL_CLAMP);
-	TgaTexture * sandstoneTga = new TgaTexture("C:\\kt_stone_2.tga", GL_CLAMP);
-
-	// generate maze
-	maze->walk(
-		
-		[boxTga](int x, int y) -> void 
-		{
-		Vertex3D * position = new Vertex3D(x, 0, y);
-		Box * box = new Box(position, 1, boxTga);
-		Renderer::getInstance().addDrawableObject(box);
-		}
-		,
-		nullptr
-		,
-		[launchTga,sandstoneTga](int x, int y, int level, char field) -> void
-		{
-
-			if (field == 'x')
-			{
-				Vertex3D * position = new Vertex3D(x, 0, y);
-				Box * box = new Box(position, 0.3 ,1, sandstoneTga);
-				Renderer::getInstance().addDrawableObject(box);
-			}
-			else if (field == 's')
-			{
-				Vertex3D * position = new Vertex3D(x, 0, y);
-				Box * box = new Box(position,0.001 ,1, launchTga);
-				Renderer::getInstance().addDrawableObject(box);
-			}
-
-			}
-
-		);
-
-		Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
-	floor->generate();
-	Renderer::getInstance().addDrawableObject(floor);
-
-	// create display list out of all objects
-	Renderer::getInstance().createDisplayList();
 
 	// register glut functions
 	glutDisplayFunc(display);
@@ -118,6 +70,8 @@ int main(int argc, char **argv)
 	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
 
 	glutIgnoreKeyRepeat(1);
+
+	loadLevel(1);
 
 	glShadeModel(GL_SMOOTH);
 
@@ -143,6 +97,73 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 	return 0;
+}
+
+void loadLevel(int index)
+{
+	Renderer::getInstance().clear();
+
+	if (index == 0)
+	{
+		maze = new Maze("data/maze.txt");
+	}
+	else if (index < 0)
+	{
+		throw new exception("Index must be greater than 0");
+	} else
+	{
+		string pathPrefix = "data/maze";
+		stringstream path;
+		path << pathPrefix << index << ".txt";
+		maze = new Maze(path.str());
+	}
+	// read maze file
+	
+	maze->parse();
+
+	// load textures
+	TgaTexture * boxTga = new TgaTexture("data/box.tga", GL_CLAMP);
+	TgaTexture * sandTga = new TgaTexture("data/sand.tga", GL_REPEAT);
+
+	TgaTexture * launchTga = new TgaTexture("data/launch_DIFFUSE.tga", GL_CLAMP);
+	TgaTexture * sandstoneTga = new TgaTexture("data/kt_stone_2.tga", GL_CLAMP);
+
+	// generate maze
+	maze->walk(
+
+		[boxTga](int x, int y) -> void
+	{
+		Vertex3D * position = new Vertex3D(x, 0, y);
+		Box * box = new Box(position, 1, boxTga);
+		Renderer::getInstance().addDrawableObject(box);
+	}
+		,
+		nullptr
+		,
+		[launchTga, sandstoneTga](int x, int y, int level, char field) -> void
+	{
+
+		if (field == 'x')
+		{
+			Vertex3D * position = new Vertex3D(x, 0, y);
+			Box * box = new Box(position, 0.3, 1, sandstoneTga);
+			Renderer::getInstance().addDrawableObject(box);
+		}
+		else if (field == 's')
+		{
+			Vertex3D * position = new Vertex3D(x, 0, y);
+			Box * box = new Box(position, 0.001, 1, launchTga);
+			Renderer::getInstance().addDrawableObject(box);
+		}
+	}
+	);
+
+	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() + 2, maze->getWidth() + 2, sandTga);
+	floor->generate();
+	Renderer::getInstance().addDrawableObject(floor);
+
+	// create display list out of all objects
+	Renderer::getInstance().createDisplayList();
 }
 
 void display() 
