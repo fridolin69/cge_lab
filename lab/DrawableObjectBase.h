@@ -24,7 +24,7 @@ protected:
 public:
 
 	DrawableObjectBase(Coord3D* position, TgaTexture* texture);
-	virtual ~DrawableObjectBase() {}
+	virtual ~DrawableObjectBase();
 
 	virtual void generate() = 0;	// create the internal array returned at getVertices()
 

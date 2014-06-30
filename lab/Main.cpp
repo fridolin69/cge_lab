@@ -52,8 +52,8 @@ long lastRender = 0;
 float translationUnit = 0.003;
 vector<long> * lastRenderDurations = new vector<long>(5);
 
-std::map<int, int> levelindex;
-std::map<int, bool> leveldone;
+map<int, int> levelindex;
+map<int, bool> leveldone;
 
 int main(int argc, char **argv) 
 {
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 	camera.setPos(-2, CAMERA_Y, -2);
 
 	// set up window
-	window = new Window(800, 768, "Lab Display");
+	window = new Window(1680, 1050, "Lab Display");
 	window->create();
 
 	// register glut functions
@@ -83,8 +83,6 @@ int main(int argc, char **argv)
 	glutIgnoreKeyRepeat(1);
 
 	loadLevel(0);
-
-	
 
 	glShadeModel(GL_SMOOTH);
 
@@ -127,7 +125,8 @@ void loadLevel(int index)
 	else if (index < 0)
 	{
 		throw new exception("Index must be greater than 0");
-	} else
+	} 
+	else
 	{
 		string pathPrefix = "data/maze";
 		stringstream path;
@@ -142,53 +141,36 @@ void loadLevel(int index)
 	TgaTexture * launchTga = new TgaTexture("data/launch_DIFFUSE.tga", GL_CLAMP);
 	TgaTexture * redstoneTga = new TgaTexture("data/kt_stone_2.tga", GL_CLAMP);
 	TgaTexture * greenstoneTga = new TgaTexture("data/kt_rock_1f_rot_shiny.tga", GL_CLAMP);
+
 	// generate maze
 	maze->walk(
-
-		[boxTga](int x, int y) -> void
-	{
-		Coord3D * position = new Coord3D(x, 0, y);
-		Box * box = new Box(position, 1, boxTga);
-		Renderer::getInstance().addDrawableObject(box);
-	}
-		,
-		[sandTga](int x, int y) -> void
-	{
-		Coord3D * position = new Coord3D(x, 0, y);
-		Plate * floor = new Plate(position, 1, 1, sandTga);
-		Renderer::getInstance().addDrawableObject(floor);
-	}
-		,
-		[launchTga,redstoneTga,greenstoneTga](int x, int z, int level, char field) -> void
-	{
-		if (field == 'x')
-		{
-				Coord3D * position = new Coord3D(x, 0, z);
-				Box * box;
-
-				//cout << "x found: levelindex: " << levelindex[z] << endl;
-				//cout << "level done? " << leveldone[levelindex[z]] <<endl;
-				if (leveldone[levelindex[z]] == true)
-				{
-					box = new Box(position, 0.3, 1, greenstoneTga);
-				} else
-				{
-					box = new Box(position, 0.3, 1, redstoneTga);
-				}
+		[boxTga](int x, int y) -> void {
+			Coord3D * position = new Coord3D(x, 0, y);
+			Box * box = new Box(position, 1, boxTga);
 			Renderer::getInstance().addDrawableObject(box);
-		}
-		else if (field == 's')
-		{
+		},
+		[sandTga](int x, int y) -> void {
+			Coord3D * position = new Coord3D(x, 0, y);
+			Plate * floor = new Plate(position, 1, 1, sandTga);
+			Renderer::getInstance().addDrawableObject(floor);
+		},
+		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void {
+			if (field == 'x')
+			{
+				Coord3D * position = new Coord3D(x, 0, z);
+				TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
+
+				Box * box = new Box(position, 0.3, 1, texture);
+				Renderer::getInstance().addDrawableObject(box);
+			}
+			else if (field == 's')
+			{
 				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
-				//cout << "pushing level"<< level << " to index: " << z << endl;
 				levelindex[z] = level;
 			}
-
 		},
-		[launchTga, redstoneTga](int x, int z, char field) -> void
-		{
+		[launchTga, redstoneTga](int x, int z, char field) -> void {
 
 			if (field == 'E')
 			{
@@ -196,16 +178,11 @@ void loadLevel(int index)
 				camera.setPos(x+0.5, CAMERA_Y, z +0.5);
 				camera.setYaw(240.0f);
 
-		}
-			else if (field == 'A')
+			} else if (field == 'A') 
 			{
-
 				Plate * floor = new Plate(new Coord3D(x, 0.0001, z),1, 1, launchTga);
-				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
-
-	}
-
+			}
 		});
 
 	// create display list out of all objects
@@ -260,12 +237,11 @@ void displayTimer(int value)
 	static int index = 0;
 
 	lastRenderDurations->at(index++ % 5) = clock() - lastRender;
-
 	long avgRenderDuration = accumulate(lastRenderDurations->begin(), lastRenderDurations->end(), 0) / 5;
 
 	Camera::getInstance().setTranslationSpeed(translationUnit * avgRenderDuration);
 
-	//cout << "Avg time: " << avgRenderDuration << " ms" << endl;
+	cout << "Avg time: " << avgRenderDuration << " ms" << endl;
 
 	lastRender = clock();
 
@@ -310,7 +286,7 @@ void inputTimer(int value)
 		if (keyboard.isDown('e')) //start level 
 		{
 			camera.getPosPtr(loadLevelIfOnCorrectPos);
-	}
+		}
 	}
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
@@ -318,33 +294,24 @@ void inputTimer(int value)
 
 void loadLevelIfOnCorrectPos(float x, float z)
 {
-
 	int floorZ = floorf(z);
 
 	cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
 	cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
 
-	loadLevel(1);
 	if (floorZ > 0)
 	{
 		int level = levelindex[floorZ];
 		cout << "load level: " << level << endl;
-	
 		loadLevel(level);
 	}
-	
 }
 
 bool canMoveTo(float x, float z)
 {
 	x = floor(x);
 	z = floor(z);
-	cout << "Checking access to " << x << " | " << z << endl;
-	//TODO
-	/*if (maze->at(x, z) == ' ')
-	{
-		return true;
-	}*/
+
 	if (maze->at(x, z) == '#' || maze->at(x, z) == 'x')
 	{
 		return false;

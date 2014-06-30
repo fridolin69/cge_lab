@@ -1,5 +1,8 @@
 #include <iostream>
 #include "Plate.h"
+#include <algorithm>
+
+using namespace std;
 
 Plate::Plate(Coord3D* position, GLfloat zWidth, GLfloat size, TgaTexture* texture)
 	: DrawableObjectBase(position, texture), size(size)
@@ -12,15 +15,7 @@ Plate::Plate(Coord3D* position, GLfloat zWidth, GLfloat size, TgaTexture* textur
 
 Plate::~Plate()
 {
-	delete this->A;
-	delete this->B;
-	delete this->C;
-	delete this->D;
 
-	delete this->position;
-	delete this->texCoords;
-	delete this->vertices;
-	delete this->normals;
 }
 
 void Plate::generate()

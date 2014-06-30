@@ -1,4 +1,5 @@
 #include "Box.h"
+#include <algorithm>
 
 Box::Box(Coord3D* position, GLfloat size, TgaTexture* texture)
 	: DrawableObjectBase(position, texture), size(size)
@@ -154,7 +155,7 @@ void Box::generate()
 		Coord3D * vec2 = *cor4 - cor2;
 		Coord3D * normal = vec1->cross(vec2);
 
-		for (int j = i; j < i + 6; j++)
+		for (unsigned int j = i; j < i + 6; j++)
 		{
 			normals->at(j) = normal;
 		}
@@ -165,18 +166,5 @@ void Box::generate()
 
 Box::~Box()
 {
-	delete this->A;
-	delete this->B;
-	delete this->C;
-	delete this->D;
 
-	delete this->E;
-	delete this->F;
-	delete this->G;
-	delete this->H;
-
-	delete this->position;
-	delete this->vertices;
-	delete this->normals;
-	delete this->texCoords;
 }
