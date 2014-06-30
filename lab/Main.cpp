@@ -56,6 +56,7 @@ std::map<int, bool> leveldone;
 
 int main(int argc, char **argv) 
 {
+	leveldone[1] = true; //TODO gehört wieder raus :) bzw in die neue timerfunc :)
 
 	glutInit(&argc, argv);
 
@@ -65,7 +66,7 @@ int main(int argc, char **argv)
 	camera.setPos(-2, CAMERA_Y, -2);
 
 	// set up window
-	window = new Window(1680, 1050, "Lab Display");
+	window = new Window(800, 768, "Lab Display");
 	window->create();
 
 	// register glut functions
@@ -80,7 +81,9 @@ int main(int argc, char **argv)
 
 	glutIgnoreKeyRepeat(1);
 
-	loadLevel(1);
+	loadLevel(0);
+
+	
 
 	glShadeModel(GL_SMOOTH);
 
@@ -136,7 +139,7 @@ void loadLevel(int index)
 
 	TgaTexture * launchTga = new TgaTexture("data/launch_DIFFUSE.tga", GL_CLAMP);
 	TgaTexture * redstoneTga = new TgaTexture("data/kt_stone_2.tga", GL_CLAMP);
-
+	TgaTexture * greenstoneTga = new TgaTexture("data/kt_rock_1f_rot_shiny.tga", GL_CLAMP);
 	// generate maze
 	maze->walk(
 		
@@ -149,14 +152,24 @@ void loadLevel(int index)
 		,
 		nullptr
 		,
-		[launchTga,redstoneTga](int x, int z, int level, char field) -> void
+		[launchTga,redstoneTga,greenstoneTga](int x, int z, int level, char field) -> void
 		{
 
 
 			if (field == 'x')
 			{
 				Vertex3D * position = new Vertex3D(x, 0, z);
-				Box * box = new Box(position, 0.3 ,1, redstoneTga);
+				Box * box;
+
+				//cout << "x found: levelindex: " << levelindex[z] << endl;
+				//cout << "level done? " << leveldone[levelindex[z]] <<endl;
+				if (leveldone[levelindex[z]] == true)
+				{
+					box = new Box(position, 0.3, 1, greenstoneTga);
+				} else
+				{
+					box = new Box(position, 0.3, 1, redstoneTga);
+				}
 				Renderer::getInstance().addDrawableObject(box);
 			}
 			else if (field == 's')
@@ -164,7 +177,7 @@ void loadLevel(int index)
 				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z), 1, 1, launchTga);
 				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
-				cout << "pushing level"<< level << " to index: " << z << endl;
+				//cout << "pushing level"<< level << " to index: " << z << endl;
 				levelindex[z] = level;
 			}
 
@@ -309,6 +322,16 @@ void loadLevelIfOnCorrectPos(float x, float z)
 
 	cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
 	cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
+
+	loadLevel(1);
+	if (floorZ > 0)
+	{
+		int level = levelindex[floorZ];
+		cout << "load level: " << level << endl;
+	
+		loadLevel(level);
+	}
+	
 }
 
 bool canMoveTo(float x, float z)
