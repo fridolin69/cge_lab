@@ -7,7 +7,7 @@ using namespace std;
 class Maze
 {
 private:
-	string path;
+	string * path;
 	vector<vector<char> *> * maze;
 
 	int width;
@@ -16,7 +16,7 @@ private:
 	bool parsed;
 
 public:
-	Maze(string path);
+	Maze(string * path);
 	virtual ~Maze();
 
 	void parse();

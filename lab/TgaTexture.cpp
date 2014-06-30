@@ -3,6 +3,7 @@
 #include "TgaTexture.h"
 
 #pragma warning(disable: 4996)
+#include <iostream>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ void TgaTexture::loadImage()
 	FILE * file = fopen(path, "rb");
 	if (file == NULL) 
 	{
+		cout << "Cannot open image file" << endl;
 		throw new exception("Cannot open image file");
 	}
 

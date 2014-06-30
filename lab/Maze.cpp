@@ -1,12 +1,11 @@
 #include "Maze.h"
 #include <fstream>
 #include <algorithm>
-
-
+#include <iostream>
 
 using namespace std;
 
-Maze::Maze(string path) : path(path)
+Maze::Maze(string * path) : path(path)
 {
 	parsed = false;
 }
@@ -21,7 +20,6 @@ Maze::~Maze()
 
 		delete maze;
 	}
-	
 }
 
 char Maze::at(int x, int y)
@@ -115,10 +113,11 @@ void Maze::parse()
 {
 	fstream mazeFile;
 
-	mazeFile.open(path, fstream::in);
+	mazeFile.open(*path, fstream::in);
 
 	if (!mazeFile.is_open())
 	{
+		cout << "Cannot open maze-file! (" << path->c_str() << ")" << endl;
 		throw new exception("Cannot open maze-file!");
 	}
 
@@ -172,4 +171,5 @@ void Maze::parse()
 	mazeFile.close();
 
 	this->parsed = true;
+	delete path;
 }

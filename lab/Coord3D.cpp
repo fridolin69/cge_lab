@@ -41,5 +41,10 @@ Coord3D* Coord3D::operator*(float const factor)
 
 GLfloat* Coord3D::toArray()
 {
-	return new GLfloat[] { x, y, z }; // make room for 4 values (maybe someone wants to add w :) ?
+	GLfloat * array = new GLfloat[4];
+	array[0] = x;
+	array[1] = y;
+	array[2] = z;
+
+	return array; // make room for 4 values (maybe someone wants to add w :) ?
 }

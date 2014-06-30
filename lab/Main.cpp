@@ -79,17 +79,17 @@ int main(int argc, char **argv)
 	glutReshapeFunc(resize);
 	glutMotionFunc(mouseMotion);
 	glutPassiveMotionFunc(mouseMotion);
+	glutIgnoreKeyRepeat(1);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
-	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
-	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
-	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
-
-	glutIgnoreKeyRepeat(1);
 
 	loadLevel(0);
 
 	glShadeModel(GL_SMOOTH);
+
+	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
+	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+	glutTimerFunc(MSEC_CHECK_FOR_EXIT, onExitPlateTimer, 0);
 
 	LightFactory::getInstance().initSpotlight(GL_LIGHT0);
 
@@ -111,7 +111,9 @@ int main(int argc, char **argv)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
+	//glutFullScreen();
 	glutMainLoop();
+
 	return 0;
 }
 
@@ -120,14 +122,18 @@ void loadLevel(int index)
 	Renderer::getInstance().clear();
 
 	if (maze != nullptr)
+	{
 		delete maze;
+	}
 
 	if (index == 0)
 	{
-		maze = new Maze("data/menu.txt");
+		maze = new Maze(new string("data/menu.txt"));
+
 	}
 	else if (index < 0)
 	{
+		cout << "Index must be greater than 0" << endl;
 		throw new exception("Index must be greater than 0");
 	}
 	else
@@ -135,7 +141,7 @@ void loadLevel(int index)
 		string pathPrefix = "data/maze";
 		stringstream path;
 		path << pathPrefix << index << ".txt";
-		maze = new Maze(path.str());
+		maze = new Maze(new string(path.str()));
 	}
 
 	// load textures
@@ -152,45 +158,45 @@ void loadLevel(int index)
 		Coord3D * position = new Coord3D(x, 0, y);
 		Box * box = new Box(position, 1, boxTga);
 		Renderer::getInstance().addDrawableObject(box);
-		},
+	},
 		[sandTga](int x, int y) -> void {
 		Coord3D * position = new Coord3D(x, 0, y);
 		Plate * floor = new Plate(position, 1, 1, sandTga);
 		Renderer::getInstance().addDrawableObject(floor);
-		},
+	},
 		[launchTga, redstoneTga, greenstoneTga](int x, int z, int level, char field) -> void {
 		if (field == 'x')
 		{
-				Coord3D * position = new Coord3D(x, 0, z);
-				TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
+			Coord3D * position = new Coord3D(x, 0, z);
+			TgaTexture * texture = (leveldone[levelindex[z]]) ? greenstoneTga : redstoneTga;
 
-				Box * box = new Box(position, 0.3, 1, texture);
-				Renderer::getInstance().addDrawableObject(box);
+			Box * box = new Box(position, 0.3, 1, texture);
+			Renderer::getInstance().addDrawableObject(box);
 		}
 		else if (field == 's')
 		{
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-				Renderer::getInstance().addDrawableObject(floor);
-				levelindex[z] = level;
-			}
-		},
-			[launchTga, redstoneTga, sandTga](int x, int z, char field) -> void {
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+			Renderer::getInstance().addDrawableObject(floor);
+			levelindex[z] = level;
+		}
+	},
+		[launchTga, redstoneTga, sandTga](int x, int z, char field) -> void {
 
-			if (field == 'E')
-			{
-				Camera &camera = Camera::getInstance();
-				camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
-				camera.setYaw(240.0f);
+		if (field == 'E')
+		{
+			Camera &camera = Camera::getInstance();
+			camera.setPos(x + 0.5, CAMERA_Y, z + 0.5);
+			camera.setYaw(240.0f);
 
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
-				Renderer::getInstance().addDrawableObject(floor);
-			}
-			else if (field == 'A')
-			{
-				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
-				Renderer::getInstance().addDrawableObject(floor);
-			}
-		});
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, sandTga);
+			Renderer::getInstance().addDrawableObject(floor);
+		}
+		else if (field == 'A')
+		{
+			Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
+			Renderer::getInstance().addDrawableObject(floor);
+		}
+	});
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
@@ -207,7 +213,7 @@ void loadLevel(int index)
 	else
 	{
 		c = "LabRob Menu";
-}
+	}
 	activeLevel = index;
 
 
@@ -267,7 +273,7 @@ void displayTimer(int value)
 
 	Camera::getInstance().setTranslationSpeed(translationUnit * avgRenderDuration);
 
-	cout << "Avg time: " << avgRenderDuration << " ms" << endl;
+	//cout << "Avg time: " << avgRenderDuration << " ms" << endl;
 
 	lastRender = clock();
 
@@ -333,7 +339,7 @@ void onExitPlateTimer(int value)
 
 void checkforExit(float x, float z)
 {
-	cout << "check for exit:  "<<endl;
+	//cout << "check for exit:  "<<endl;
 	if (maze->at(x, z) == 'A' && activeLevel != 0)
 	{
 		cout << "Congrats you found the exit";
