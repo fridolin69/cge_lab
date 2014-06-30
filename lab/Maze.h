@@ -17,6 +17,7 @@ private:
 
 public:
 	Maze(string path);
+	virtual ~Maze();
 
 	void parse();
 	char at(int x, int y);
@@ -25,7 +26,5 @@ public:
 
 	int getWidth();
 	int getHeight();
-
-	virtual ~Maze();
 };
 

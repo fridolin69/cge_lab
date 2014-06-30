@@ -85,10 +85,9 @@
     <ClCompile Include="LightFactory.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Plate.cpp" />
-    <ClCompile Include="TexCoords.cpp" />
+    <ClCompile Include="Coord2D.cpp" />
     <ClCompile Include="TgaTexture.cpp" />
-    <ClCompile Include="Util.cpp" />
-    <ClCompile Include="Vertex3D.cpp" />
+    <ClCompile Include="Coord3D.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -101,10 +100,9 @@
     <ClInclude Include="LightFactory.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Plate.h" />
-    <ClInclude Include="TexCoords.h" />
+    <ClInclude Include="Coord2D.h" />
     <ClInclude Include="TgaTexture.h" />
-    <ClInclude Include="Util.h" />
-    <ClInclude Include="Vertex3D.h" />
+    <ClInclude Include="Coord3D.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DrawableObjectBase.h" />
     <ClInclude Include="Renderer.h" />

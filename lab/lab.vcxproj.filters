@@ -24,9 +24,6 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vertex3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Box.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -42,9 +39,6 @@
     <ClCompile Include="DrawableObjectBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TexCoords.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TgaTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,10 +48,13 @@
     <ClCompile Include="Maze.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Util.cpp">
+    <ClCompile Include="LightFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightFactory.cpp">
+    <ClCompile Include="Coord2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Coord3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,9 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Box.h">
@@ -86,9 +80,6 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TexCoords.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TgaTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,10 +89,13 @@
     <ClInclude Include="Maze.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Util.h">
+    <ClInclude Include="LightFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightFactory.h">
+    <ClInclude Include="Coord3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Coord2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

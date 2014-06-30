@@ -13,39 +13,31 @@ void ::Renderer::createDisplayList()
 
 	glNewList(index, GL_COMPILE);
 
-		for_each(objects->begin(), objects->end(), [](DrawableObjectBase * object) -> void {
+		for_each(objects->begin(), objects->end(), [](DrawableObjectBase * drawable) -> void {
 			glPushMatrix();
-				glTranslatef(object->getPosition()->getX(), object->getPosition()->getY(), object->getPosition()->getZ()); // translate to object position
+				glTranslatef(drawable->getPosition()->x, drawable->getPosition()->y, drawable->getPosition()->z); // translate to object position
 
-				glBindTexture(GL_TEXTURE_2D, object->getTexture()->getTextureId());
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, object->getTexture()->getWrapMode());
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, object->getTexture()->getWrapMode());
+				glBindTexture(GL_TEXTURE_2D, drawable->getTexture()->getTextureId());
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, drawable->getTexture()->getWrapMode());
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, drawable->getTexture()->getWrapMode());
 
-				glBegin(object->getObjectType()); // request object type
+				std::vector<Coord3D* > * vertices = drawable->getVertices();
+				std::vector<Coord3D* > * normals = drawable->getNormals();
+				std::vector<Coord2D* > * texCoords = drawable->getTexCoords();
 
-					Vertex3D ** vertices = object->getVertices();
-					Vertex3D ** normals = object->getNormals();
-					TexCoords ** texCoords = object->getTexCoords();
+				for (int j = 0; j < drawable->getIterations(); j++)
+				{
+					glBegin(drawable->getObjectType()); // request object type
 
-					if (vertices == nullptr)
+					for (int i = j * drawable->getIterations(); i < (j + 1) * drawable->getIterations(); i++)
 					{
-						return;
+						glTexCoord2fv(texCoords->at(i)->toArray());
+						glNormal3fv(normals->at(i)->toArray());
+						glVertex3fv(vertices->at(i)->toArray());
 					}
 
-					// draw every vertex of the object
-					for (int i = 0; i < object->getVertexCount(); i++)
-					{
-						if (vertices[i] == nullptr) // prevent objects from crashing the render engine
-						{
-							continue;
-						}
-
-						glTexCoord2f(texCoords[i]->getX(), texCoords[i]->getY());
-						glNormal3f(normals[i]->getX(), normals[i]->getY(), normals[i]->getZ());
-						glVertex3f(vertices[i]->getX(), vertices[i]->getY(), vertices[i]->getZ());
-					}
-
-				glEnd();
+					glEnd();
+				}
 
 			glPopMatrix();
 		});
