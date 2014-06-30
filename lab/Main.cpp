@@ -163,7 +163,7 @@ void loadLevel(int index)
 	{
 		if (field == 'x')
 		{
-				Vertex3D * position = new Vertex3D(x, 0, z);
+				Coord3D * position = new Coord3D(x, 0, z);
 				Box * box;
 
 				//cout << "x found: levelindex: " << levelindex[z] << endl;
@@ -179,7 +179,7 @@ void loadLevel(int index)
 		}
 		else if (field == 's')
 		{
-				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z), 1, 1, launchTga);
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
 				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
 				//cout << "pushing level"<< level << " to index: " << z << endl;
@@ -200,7 +200,7 @@ void loadLevel(int index)
 			else if (field == 'A')
 			{
 
-				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z),1, 1, launchTga);
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z),1, 1, launchTga);
 				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
 
