@@ -1,6 +1,0 @@
-1. ein 2D array mit dem labyrinth
-2. die kamera hat eine funktion getPosOfNextMove() -> damit wird vorausberchnet, wo sich die Kamera befinden wird
-3. man nimmt die x und z koordinate, castet auf einen int
-4. auslesen des wertes des 2D array an dieses koordinaten
-5. falls leerzeichen -> kamera darf sich bewegen
-6. falls raute -> kamera darf sich nicht bewegen

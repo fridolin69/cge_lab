@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Maze::Maze(char* path) : path(path)
+Maze::Maze(string path) : path(path)
 {
 	parsed = false;
 }
@@ -33,9 +33,9 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 	for (int y = 0; y < height; y++)
 
 	{
-		for (int x = 0; x < width; x++)
-		{
-
+	for (int x = 0; x < width; x++)
+	{
+			
 			//#####
 			//# E #
 			//#sss#
@@ -52,14 +52,13 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 				{
 					sCounter = 0;
 					++levelnumber;
-				}
+			}
 				launchCallback(x, y, levelnumber, 's');
 			}
 			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)
 			{
 				launchCallback(x, y, levelnumber, 'x');
 			}
-
 
 			else if (maze->at(y)->at(x) == '#' && boxCallback != nullptr)
 			{
@@ -133,7 +132,7 @@ void Maze::parse()
 			break;
 
 		case '#':
-		case ' ': 
+		case ' ':
 		case 's':
 		case 'x':
 		case 'E':

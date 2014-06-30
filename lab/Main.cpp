@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <sstream>
 #include <time.h>
 #include <vector>
 #include <algorithm>
@@ -17,7 +18,7 @@
 #include "KeyboardInput.h"
 #include "Window.h"
 #include "TgaTexture.h"
-#include "Util.h" 
+#include "Util.h"
 
 #include<map>
 
@@ -42,6 +43,7 @@ void displayTimer(int value);
 void reportGLError(const char * msg);
 void loadLevelIfOnCorrectPos(float x, float z);
 bool canMoveTo(float x, float z);
+void loadLevel(int index);
 
 Window * window;
 Maze * maze;
@@ -63,19 +65,77 @@ int main(int argc, char **argv)
 	camera.setPos(-2, CAMERA_Y, -2);
 
 	// set up window
-	window = new Window(800, 768, "Lab Display");
+	window = new Window(1680, 1050, "Lab Display");
 	window->create();
 
+	// register glut functions
+	glutDisplayFunc(display);
+	glutReshapeFunc(resize);
+	glutMotionFunc(mouseMotion);
+	glutPassiveMotionFunc(mouseMotion);
+	glutKeyboardFunc(keyDown);
+	glutKeyboardUpFunc(keyUp);
+	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
+	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
+
+	glutIgnoreKeyRepeat(1);
+
+	loadLevel(1);
+
+	glShadeModel(GL_SMOOTH);
+
+	LightFactory::getInstance().initSpotlight(GL_LIGHT0);
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	Color * white = new Color(1, 1, 1);
+	Color * black = new Color(0, 0, 0);
+	GLfloat * material = white->toArray();
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
+	glMaterialfv(GL_FRONT, GL_SHININESS, material);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black->toArray());
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glutMainLoop();
+	return 0;
+}
+
+void loadLevel(int index)
+{
+	Renderer::getInstance().clear();
+
+	if (index == 0)
+	{
+		maze = new Maze("data/maze.txt");
+	}
+	else if (index < 0)
+	{
+		throw new exception("Index must be greater than 0");
+	} else
+	{
+		string pathPrefix = "data/maze";
+		stringstream path;
+		path << pathPrefix << index << ".txt";
+		maze = new Maze(path.str());
+	}
 	// read maze file
-	maze = new Maze("C:\\maze.txt");
+	
 	maze->parse();
 
 	// load textures
-	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
-	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
+	TgaTexture * boxTga = new TgaTexture("data/box.tga", GL_CLAMP);
+	TgaTexture * sandTga = new TgaTexture("data/sand.tga", GL_REPEAT);
 
-	TgaTexture * launchTga = new TgaTexture("C:\\launch_DIFFUSE.tga", GL_CLAMP);
-	TgaTexture * redstoneTga = new TgaTexture("C:\\kt_stone_2.tga", GL_CLAMP);
+	TgaTexture * launchTga = new TgaTexture("data/launch_DIFFUSE.tga", GL_CLAMP);
+	TgaTexture * redstoneTga = new TgaTexture("data/kt_stone_2.tga", GL_CLAMP);
 
 	// generate maze
 	maze->walk(
@@ -91,7 +151,7 @@ int main(int argc, char **argv)
 		,
 		[launchTga,redstoneTga](int x, int z, int level, char field) -> void
 		{
-			
+
 
 			if (field == 'x')
 			{
@@ -130,49 +190,12 @@ int main(int argc, char **argv)
 
 		});
 
-	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
+		Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
 	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
-
-	// register glut functions
-	glutDisplayFunc(display);
-	glutReshapeFunc(resize);
-	glutMotionFunc(mouseMotion);
-	glutPassiveMotionFunc(mouseMotion);
-	glutKeyboardFunc(keyDown);
-	glutKeyboardUpFunc(keyUp);
-	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
-	glutTimerFunc(MSEC_DISPLAY_TIMER, displayTimer, 0);
-
-	glutIgnoreKeyRepeat(1);
-
-	glShadeModel(GL_SMOOTH);
-
-	LightFactory::getInstance().initSpotlight(GL_LIGHT0);
-
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	Color * white = new Color(1, 1, 1);
-	Color * black = new Color(0, 0, 0);
-	GLfloat * material = white->toArray();
-
-	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
-	glMaterialfv(GL_FRONT, GL_SHININESS, material);
-
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black->toArray());
-
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-
-	glutMainLoop();
-	return 0;
 }
 
 void display() 
