@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vertex3D.h"
+#include "Coord3D.h"
 #include <GL/glut.h>
 
 class LightFactory
@@ -23,8 +23,8 @@ public:
 	void enable(GLuint lightIndex);
 	void disable(GLuint lightIndex);
 	void initSpotlight(GLuint lightIndex);
-	void setPosition(GLuint lightIndex, Vertex3D * position);
-	void setDirection(GLuint lightIndex, Vertex3D * direction);
+	void setPosition(GLuint lightIndex, Coord3D * position);
+	void setDirection(GLuint lightIndex, Coord3D * direction);
 	void setAttenuation(GLuint lightIndex, GLfloat constant, GLfloat linear, GLfloat quadratic);
 };
 

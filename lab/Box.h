@@ -6,22 +6,22 @@
 class Box : public DrawableObjectBase
 {
 private:
-	Vertex3D * cornerA;
-	Vertex3D * cornerB;
-	Vertex3D * cornerC;
-	Vertex3D * cornerD;
+	Coord3D * A;
+	Coord3D * B;
+	Coord3D * C;
+	Coord3D * D;
 
-	Vertex3D * cornerE;
-	Vertex3D * cornerF;
-	Vertex3D * cornerG;
-	Vertex3D * cornerH;
+	Coord3D * E;
+	Coord3D * F;
+	Coord3D * G;
+	Coord3D * H;
 
 	GLfloat size;
 	GLfloat height;
 
 public:
-	Box(Vertex3D* position, GLfloat size, TgaTexture* texture);
-	Box(Vertex3D* position, GLfloat height, GLfloat width, TgaTexture* texture);
+	Box(Coord3D* position, GLfloat size, TgaTexture* texture);
+	Box(Coord3D* position, GLfloat height, GLfloat width, TgaTexture* texture);
 	
 	virtual ~Box();
 

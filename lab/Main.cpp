@@ -7,6 +7,7 @@
 #include <time.h>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 #include "LightFactory.h"
 #include "Plate.h"
@@ -18,7 +19,7 @@
 #include "KeyboardInput.h"
 #include "Window.h"
 #include "TgaTexture.h"
-#include "Util.h"
+#include "Color.h"
 
 #include<map>
 
@@ -46,9 +47,9 @@ void loadLevelIfOnCorrectPos(float x, float z);
 bool canMoveTo(float x, float z);
 void loadLevel(int index);
 
-Window * window;
-Maze * maze;
-long lastRender;
+Window * window = nullptr;
+Maze * maze = nullptr;
+long lastRender = 0;
 float translationUnit = 0.003;
 vector<long> * lastRenderDurations = new vector<long>(5);
 
@@ -93,15 +94,16 @@ int main(int argc, char **argv)
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	Color * white = new Color(1, 1, 1);
-	Color * black = new Color(0, 0, 0);
+	Color * superDarkGrey = new Color(0.02f, 0.02f, 0.02f);
 	GLfloat * material = white->toArray();
 
+	// TODO test if needed
 	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
 	glMaterialfv(GL_FRONT, GL_SHININESS, material);
 
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black->toArray());
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, superDarkGrey->toArray());
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
@@ -117,6 +119,9 @@ void loadLevel(int index)
 
 	Renderer::getInstance().clear();
 
+	if (maze != nullptr)
+		delete maze;
+
 	if (index == 0)
 	{
 		maze = new Maze("data/menu.txt");
@@ -131,9 +136,6 @@ void loadLevel(int index)
 		path << pathPrefix << index << ".txt";
 		maze = new Maze(path.str());
 	}
-	// read maze file
-	
-	maze->parse();
 
 	// load textures
 	TgaTexture * boxTga = new TgaTexture("data/box.tga", GL_CLAMP);
@@ -144,23 +146,26 @@ void loadLevel(int index)
 	TgaTexture * greenstoneTga = new TgaTexture("data/kt_rock_1f_rot_shiny.tga", GL_CLAMP);
 	// generate maze
 	maze->walk(
-		
-		[boxTga](int x, int y) -> void 
-		{
-		Vertex3D * position = new Vertex3D(x, 0, y);
+
+		[boxTga](int x, int y) -> void
+	{
+		Coord3D * position = new Coord3D(x, 0, y);
 		Box * box = new Box(position, 1, boxTga);
 		Renderer::getInstance().addDrawableObject(box);
-		}
+	}
 		,
-		nullptr
+		[sandTga](int x, int y) -> void
+	{
+		Coord3D * position = new Coord3D(x, 0, y);
+		Plate * floor = new Plate(position, 1, 1, sandTga);
+		Renderer::getInstance().addDrawableObject(floor);
+	}
 		,
 		[launchTga,redstoneTga,greenstoneTga](int x, int z, int level, char field) -> void
+	{
+		if (field == 'x')
 		{
-
-
-			if (field == 'x')
-			{
-				Vertex3D * position = new Vertex3D(x, 0, z);
+				Coord3D * position = new Coord3D(x, 0, z);
 				Box * box;
 
 				//cout << "x found: levelindex: " << levelindex[z] << endl;
@@ -172,11 +177,11 @@ void loadLevel(int index)
 				{
 					box = new Box(position, 0.3, 1, redstoneTga);
 				}
-				Renderer::getInstance().addDrawableObject(box);
-			}
-			else if (field == 's')
-			{
-				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z), 1, 1, launchTga);
+			Renderer::getInstance().addDrawableObject(box);
+		}
+		else if (field == 's')
+		{
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z), 1, 1, launchTga);
 				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
 				//cout << "pushing level"<< level << " to index: " << z << endl;
@@ -193,21 +198,17 @@ void loadLevel(int index)
 				camera.setPos(x+0.5, CAMERA_Y, z +0.5);
 				camera.setYaw(240.0f);
 
-			}
+		}
 			else if (field == 'A')
 			{
 
-				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z),1, 1, launchTga);
+				Plate * floor = new Plate(new Coord3D(x, 0.0001, z),1, 1, launchTga);
 				floor->generate();
 				Renderer::getInstance().addDrawableObject(floor);
 
-			}
+	}
 
 		});
-
-		Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
-	floor->generate();
-	Renderer::getInstance().addDrawableObject(floor);
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
@@ -279,7 +280,7 @@ void displayTimer(int value)
 
 	lastRenderDurations->at(index++ % 5) = clock() - lastRender;
 
-	long avgRenderDuration = Util::avg(lastRenderDurations);
+	long avgRenderDuration = accumulate(lastRenderDurations->begin(), lastRenderDurations->end(), 0) / 5;
 
 	Camera::getInstance().setTranslationSpeed(translationUnit * avgRenderDuration);
 
@@ -328,7 +329,7 @@ void inputTimer(int value)
 		if (keyboard.isDown('e')) //start level 
 		{
 			camera.getPosPtr(loadLevelIfOnCorrectPos);
-		}
+	}
 	}
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);

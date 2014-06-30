@@ -40,8 +40,12 @@ void Camera::refresh()
 				this->zPos + this->zDirectionVec,
 				0.0f, 1.0f, 0.0f);
 
-	LightFactory::getInstance().setPosition(GL_LIGHT0, new Vertex3D(xPos, yPos, zPos));
-	LightFactory::getInstance().setDirection(GL_LIGHT0, new Vertex3D(xDirectionVec, yDirectionVec, zDirectionVec));
+	Coord3D * position = new Coord3D(xPos, yPos, zPos);
+	Coord3D * direction = new Coord3D(xDirectionVec, yDirectionVec, zDirectionVec);
+	Coord3D * backFlashlightPosition = (*position) - (*direction) * 3;
+
+	LightFactory::getInstance().setPosition(GL_LIGHT0, backFlashlightPosition);
+	LightFactory::getInstance().setDirection(GL_LIGHT0, direction);
 
 	//printf("Camera: %f %f %f Direction vector: %f %f %f\n", xPos, yPos, zPos, xDirectionVec, yDirectionVec, zDirectionVec);
 }

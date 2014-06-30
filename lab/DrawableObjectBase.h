@@ -1,42 +1,44 @@
 #ifndef _DRAWABLE_OBJECT_H_
 #define _DRAWABLE_OBJECT_H_
 
-#include "Color.h"
-#include "TexCoords.h"
+#include <vector>
+#include "Coord2D.h"
+#include "Coord3D.h"
 #include "TgaTexture.h"
-#include "Vertex3D.h"
 
 // base class for any drawable object
 class DrawableObjectBase
 {
-private:
-	
 protected:
 	int vertexCount;
+	int iterations;
 	GLenum type;					// defines the type of geometry object the vertices should build, will be passed directly to glBegin()
-	Vertex3D * position;
-	Vertex3D ** vertices;
-	Vertex3D ** normals;
 
-	TexCoords ** texCoords;
+	std::vector<Coord3D*> * vertices;
+	std::vector<Coord3D*> * normals;
+	std::vector<Coord2D*> * texCoords;
+
+	Coord3D * position;
 	TgaTexture * texture;
 
 public:
 
-	DrawableObjectBase(Vertex3D* position, TgaTexture* texture);
+	DrawableObjectBase(Coord3D* position, TgaTexture* texture);
 	virtual ~DrawableObjectBase() {}
 
 	virtual void generate() = 0;	// create the internal array returned at getVertices()
 
-	Vertex3D ** getVertices();		// returns the array of vertices
-	Vertex3D ** getNormals();
+
+	std::vector<Coord3D*> * getVertices();		// returns the array of vertices
+	std::vector<Coord3D*> * getNormals();
 
 	TgaTexture * getTexture();
-	TexCoords ** getTexCoords();
+	std::vector<Coord2D*> * getTexCoords();
+
+	int getIterations();
 
 	GLenum getObjectType();			// returns the GLenum of the object
-	Vertex3D * getPosition();		// returns the translation vector
-	int getVertexCount();			// returns the number of vertices returned
+	Coord3D * getPosition();		// returns the translation vector
 };
 
 #endif

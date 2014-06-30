@@ -28,25 +28,27 @@ void LightFactory::initSpotlight(GLuint lightIndex)
 
 	this->enable(lightIndex);
 
-	glLightf(lightIndex, GL_SPECULAR, 0.8f);
-	glLightf(lightIndex, GL_DIFFUSE, 0.1f);
+	glLightf(lightIndex, GL_SPECULAR, 0.1f);
+	glLightf(lightIndex, GL_DIFFUSE, 0.0f);
 	glLightf(lightIndex, GL_AMBIENT, 0.0f);
 
-	//glLightf(lightIndex, GL_SPOT_CUTOFF, 20); // angle is 0 to 180
-	glLightf(lightIndex, GL_SPOT_EXPONENT, 80); // exponent is 0 to 128
+	glLightf(lightIndex, GL_SPOT_CUTOFF, 15); // angle is 0 to 180
+	glLightf(lightIndex, GL_SPOT_EXPONENT, 128); // exponent is 0 to 128
 
-	this->setAttenuation(lightIndex, 1, 0, 3);
+	this->setAttenuation(lightIndex, 0, 0, 0.1f);
 }
 
-void LightFactory::setPosition(GLuint lightIndex, Vertex3D* position)
+void LightFactory::setPosition(GLuint lightIndex, Coord3D* position)
 {
-	GLfloat lightPosition[] = { position->getX(), position->getY(), position->getZ(), 1.0f };
+	GLfloat * lightPosition = position->toArray();
+	lightPosition[3] = 1.0f;
+
 	glLightfv(lightIndex, GL_POSITION, lightPosition);
 }
 
-void LightFactory::setDirection(GLuint lightIndex, Vertex3D* direction)
+void LightFactory::setDirection(GLuint lightIndex, Coord3D* direction)
 {
-	GLfloat lightDirection[] = { direction->getX(), direction->getY(), direction->getZ() };
+	GLfloat * lightDirection = direction->toArray();
 	glLightfv(lightIndex, GL_SPOT_DIRECTION, lightDirection);
 }
 

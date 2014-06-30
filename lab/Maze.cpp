@@ -11,6 +11,12 @@ Maze::Maze(string path) : path(path)
 	parsed = false;
 }
 
+Maze::~Maze()
+{
+	if (maze != nullptr)
+		delete maze;
+}
+
 char Maze::at(int x, int y)
 {
 	if (!parsed)
@@ -28,6 +34,11 @@ char Maze::at(int x, int y)
 
 void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback, function<void(int, int, int, char)> launchCallback, function<void(int, int, char)> inOutCallback)
 {
+	if (!parsed)
+	{
+		this->parse();
+	}
+
 	int levelnumber = 1;
 	int sCounter = 0;
 	for (int y = 0; y < height; y++)
@@ -155,10 +166,4 @@ void Maze::parse()
 	mazeFile.close();
 
 	this->parsed = true;
-}
-
-Maze::~Maze()
-{
-	if (maze != nullptr)
-		delete maze;
 }

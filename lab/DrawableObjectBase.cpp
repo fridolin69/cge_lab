@@ -1,42 +1,43 @@
 #include "DrawableObjectBase.h"
 #include "TgaTexture.h"
-
-int DrawableObjectBase::getVertexCount()
-{
-	return this->vertexCount;
-}
-
-Vertex3D ** DrawableObjectBase::getVertices()
-{
-	return this->vertices;
-}
+#include "Coord2D.h"
 
 TgaTexture * DrawableObjectBase::getTexture()
 {
 	return this->texture;
 }
 
-DrawableObjectBase::DrawableObjectBase(Vertex3D* position, TgaTexture* texture)
+DrawableObjectBase::DrawableObjectBase(Coord3D* position, TgaTexture* texture)
 	: position(position), texture(texture)
 {
 	vertices = nullptr;
-	texCoords = nullptr;
 	normals = nullptr;
+	texCoords = nullptr;
 	vertexCount = 0;
 	type = 0;
 }
 
-Vertex3D** DrawableObjectBase::getNormals()
+std::vector<Coord3D*> * DrawableObjectBase::getVertices()
+{
+	return this->vertices;
+}
+
+std::vector<Coord3D*> * DrawableObjectBase::getNormals()
 {
 	return this->normals;
 }
 
-TexCoords** DrawableObjectBase::getTexCoords()
+std::vector<Coord2D*> * DrawableObjectBase::getTexCoords()
 {
 	return this->texCoords;
 }
 
-Vertex3D * DrawableObjectBase::getPosition()
+int DrawableObjectBase::getIterations()
+{
+	return this->iterations;
+}
+
+Coord3D * DrawableObjectBase::getPosition()
 {
 	return this->position;
 }
