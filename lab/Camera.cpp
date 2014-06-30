@@ -62,6 +62,11 @@ void Camera::getPos(float &x, float &y, float &z)
 	z = zPos;
 }
 
+void Camera::getPosPtr(std::function<void(float, float)> func)
+{
+	func(xPos, zPos);
+}
+
 void Camera::getDirectionVector(float &x, float &y, float &z)
 {
 	x = xDirectionVec;

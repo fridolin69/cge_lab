@@ -2,6 +2,8 @@
 #include <fstream>
 #include <algorithm>
 
+
+
 using namespace std;
 
 Maze::Maze(char* path) : path(path)
@@ -24,31 +26,38 @@ char Maze::at(int x, int y)
 	return maze->at(y)->at(x);
 }
 
-void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback, function<void(int, int, int,char)> launchCallback)
+void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback, function<void(int, int, int, char)> launchCallback, function<void(int, int, char)> inOutCallback)
 {
-	int levelnumber = 0;
+	int levelnumber = 1;
+	int sCounter = 0;
+	for (int y = 0; y < height; y++)
 
-	for (int x = 0; x < width; x++)
 	{
-		for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
 		{
-			
-			//#   # # # for the menu
-			//#       #
-			//#       #
-			//# s s s #
-			//# s x s #
-			//# s s s #
-			//#       #
-			//#       #
 
+			//#####
+			//# E #
+			//#sss#
+			//#sxs#
+			//#sss#
+			//#   #
+			//#   #
+			//# A #
+			//#####
 			if (maze->at(y)->at(x) == 's' && launchCallback != nullptr)
 			{
-				launchCallback(x, y, -1, 's');
+				++sCounter;
+				if (sCounter == 9)
+				{
+					sCounter = 0;
+					++levelnumber;
+				}
+				launchCallback(x, y, levelnumber, 's');
 			}
-			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)//found new level entry
+			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)
 			{
-				launchCallback(x, y, ++levelnumber,'x');
+				launchCallback(x, y, levelnumber, 'x');
 			}
 
 
@@ -59,7 +68,18 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 
 			else if (maze->at(y)->at(x) == ' ' && pathCallback != nullptr)
 			{
+
 				pathCallback(x, y);
+			}
+
+			else if (maze->at(y)->at(x) == 'E' && inOutCallback != nullptr)
+			{
+				inOutCallback(x, y, 'E');
+			}
+
+			else if (maze->at(y)->at(x) == 'A' && inOutCallback != nullptr)
+			{
+				inOutCallback(x, y, 'A');
 			}
 		}
 	}
@@ -96,7 +116,8 @@ void Maze::parse()
 
 	while (mazeFile.good())
 	{
-		switch (char(mazeFile.get()))
+		char buf = char(mazeFile.get());
+		switch (buf)
 		{
 			// EOL -> define linelength and increase linenumber (y)
 		case '\n':
@@ -112,34 +133,19 @@ void Maze::parse()
 			break;
 
 		case '#':
-			x++;
-			maze->at(y)->push_back('#');
-			break;
-
-		case ' ':
-			x++;
-			maze->at(y)->push_back(' ');
-			break;
-
+		case ' ': 
 		case 's':
-			x++;
-			maze->at(y)->push_back('s');
-			break;
-
 		case 'x':
+		case 'E':
+		case 'A':
 			x++;
-			maze->at(y)->push_back('x');
-			break;
-
-		case 'f':
-			x++;
-			maze->at(y)->push_back('f');
+			maze->at(y)->push_back(buf);
 			break;
 
 		case -1:
 			continue;
 		}
-		this ->parsed = true;
+		this->parsed = true;
 	}
 
 	maze->resize(maze->size() - 1);

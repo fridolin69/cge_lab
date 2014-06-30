@@ -48,6 +48,7 @@ public:
 	void refresh();
 	void setPos(float x, float y, float z);
 	void getPos(float &x, float &y, float &z);
+	void getPosPtr(std::function<void(float, float)> func);
 	void getDirectionVector(float &x, float &y, float &z);
 	void setYaw(float angle);
 	void setPitch(float angle);

@@ -17,7 +17,9 @@
 #include "KeyboardInput.h"
 #include "Window.h"
 #include "TgaTexture.h"
-#include "Util.h"
+#include "Util.h" 
+
+#include<map>
 
 #include <GL\glut.h>
 
@@ -25,6 +27,8 @@
 #define MAX_FPS 60.0f
 #define MSEC_DISPLAY_TIMER (1000.0f / MAX_FPS)
 #define MSEC_INPUT_TIMER 10
+
+#define CAMERA_Y 0.5f
 
 using namespace std;
 
@@ -36,6 +40,7 @@ void mouseMotion(int x, int y);
 void inputTimer(int value);
 void displayTimer(int value);
 void reportGLError(const char * msg);
+void loadLevelIfOnCorrectPos(float x, float z);
 bool canMoveTo(float x, float z);
 
 Window * window;
@@ -44,14 +49,18 @@ long lastRender;
 float translationUnit = 0.003;
 vector<long> * lastRenderDurations = new vector<long>(5);
 
+std::map<int, int> levelindex;
+std::map<int, bool> leveldone;
+
 int main(int argc, char **argv) 
 {
+
 	glutInit(&argc, argv);
 
 	// set up camera
 	Camera &camera = Camera::getInstance();
 	camera.setRotationSpeed(M_PI / 180 * 0.2);
-	camera.setPos(-2, 0.5f, -2);
+	camera.setPos(-2, CAMERA_Y, -2);
 
 	// set up window
 	window = new Window(800, 768, "Lab Display");
@@ -66,7 +75,7 @@ int main(int argc, char **argv)
 	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
 
 	TgaTexture * launchTga = new TgaTexture("C:\\launch_DIFFUSE.tga", GL_CLAMP);
-	TgaTexture * sandstoneTga = new TgaTexture("C:\\kt_stone_2.tga", GL_CLAMP);
+	TgaTexture * redstoneTga = new TgaTexture("C:\\kt_stone_2.tga", GL_CLAMP);
 
 	// generate maze
 	maze->walk(
@@ -80,27 +89,48 @@ int main(int argc, char **argv)
 		,
 		nullptr
 		,
-		[launchTga,sandstoneTga](int x, int y, int level, char field) -> void
+		[launchTga,redstoneTga](int x, int z, int level, char field) -> void
 		{
+			
 
 			if (field == 'x')
 			{
-				Vertex3D * position = new Vertex3D(x, 0, y);
-				Box * box = new Box(position, 0.3 ,1, sandstoneTga);
+				Vertex3D * position = new Vertex3D(x, 0, z);
+				Box * box = new Box(position, 0.3 ,1, redstoneTga);
 				Renderer::getInstance().addDrawableObject(box);
 			}
 			else if (field == 's')
 			{
-				Vertex3D * position = new Vertex3D(x, 0, y);
-				Box * box = new Box(position,0.001 ,1, launchTga);
-				Renderer::getInstance().addDrawableObject(box);
+				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z), 1, 1, launchTga);
+				floor->generate();
+				Renderer::getInstance().addDrawableObject(floor);
+				cout << "pushing level"<< level << " to index: " << z << endl;
+				levelindex[z] = level;
 			}
 
+		},
+		[launchTga, redstoneTga](int x, int z, char field) -> void
+		{
+
+			if (field == 'E')
+			{
+				Camera &camera = Camera::getInstance();
+				camera.setPos(x+0.5, CAMERA_Y, z +0.5);
+				camera.setYaw(240.0f);
+
+			}
+			else if (field == 'A')
+			{
+
+				Plate * floor = new Plate(new Vertex3D(x, 0.0001, z),1, 1, launchTga);
+				floor->generate();
+				Renderer::getInstance().addDrawableObject(floor);
+
 			}
 
-		);
+		});
 
-		Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
+	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
 	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
 
@@ -138,7 +168,7 @@ int main(int argc, char **argv)
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
 	glutMainLoop();
@@ -239,9 +269,23 @@ void inputTimer(int value)
 		{
 			camera.strafe(-speed, canMoveTo);
 		}
+
+		if (keyboard.isDown('e')) //start level 
+		{
+			camera.getPosPtr(loadLevelIfOnCorrectPos);
+		}
 	}
 
 	glutTimerFunc(MSEC_INPUT_TIMER, inputTimer, 0);
+}
+
+void loadLevelIfOnCorrectPos(float x, float z)
+{
+
+	int floorZ = floorf(z);
+
+	cout << "e pressed.. camera is at.. x " << x << " | " << z << " z" << endl;
+	cout << "z: " << floorZ << " level: " << levelindex[floorZ] << endl;
 }
 
 bool canMoveTo(float x, float z)
