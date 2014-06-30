@@ -2,6 +2,8 @@
 #include <fstream>
 #include "TgaTexture.h"
 
+#pragma warning(disable: 4996)
+
 using namespace std;
 
 TgaTexture::TgaTexture(char* path, GLint glTextureWrapMode)
@@ -13,6 +15,7 @@ TgaTexture::TgaTexture(char* path, GLint glTextureWrapMode)
 
 TgaTexture::~TgaTexture()
 {
+
 }
 
 void TgaTexture::loadImage()

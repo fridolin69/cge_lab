@@ -14,7 +14,14 @@ Maze::Maze(string path) : path(path)
 Maze::~Maze()
 {
 	if (maze != nullptr)
+	{
+		for_each(maze->begin(), maze->end(), [](vector<char> * vec) -> void {
+			delete vec;
+		});
+
 		delete maze;
+	}
+	
 }
 
 char Maze::at(int x, int y)
@@ -46,7 +53,6 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 	{
 	for (int x = 0; x < width; x++)
 	{
-			
 			//#####
 			//# E #
 			//#sss#
@@ -63,7 +69,7 @@ void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> p
 				{
 					sCounter = 0;
 					++levelnumber;
-			}
+				}
 				launchCallback(x, y, levelnumber, 's');
 			}
 			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)

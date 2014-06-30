@@ -12,6 +12,7 @@ private:
 
 	GLfloat size;
 	GLfloat zWidth;
+
 public:
 	Plate(Coord3D* position, GLfloat zWidth, GLfloat size, TgaTexture* texture);
 	virtual ~Plate();

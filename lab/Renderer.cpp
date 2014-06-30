@@ -42,6 +42,8 @@ void ::Renderer::createDisplayList()
 				}
 
 			glPopMatrix();
+
+			delete drawable;
 		});
 
 	glEndList();

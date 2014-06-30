@@ -1,6 +1,7 @@
 #include "DrawableObjectBase.h"
 #include "TgaTexture.h"
 #include "Coord2D.h"
+#include <algorithm>
 
 TgaTexture * DrawableObjectBase::getTexture()
 {
@@ -15,6 +16,44 @@ DrawableObjectBase::DrawableObjectBase(Coord3D* position, TgaTexture* texture)
 	texCoords = nullptr;
 	vertexCount = 0;
 	type = 0;
+}
+
+DrawableObjectBase::~DrawableObjectBase()
+{
+	for_each(normals->begin(), normals->end(), [](Coord3D * coord) -> void {
+		if (coord != nullptr)
+		{
+			//delete coord;
+			coord = nullptr;
+		}
+	});
+
+	for_each(texCoords->begin(), texCoords->end(), [](Coord2D * coord) -> void {
+		if (coord != nullptr)
+		{
+			//delete coord;
+			coord = nullptr;
+		}
+	});
+
+	for_each(vertices->begin(), vertices->end(), [](Coord3D * coord) -> void {
+		if (coord != nullptr)
+		{
+			//delete coord;
+			coord = nullptr;
+		}
+	});
+
+	delete this->position;
+	delete this->vertices;
+	delete this->normals;
+	delete this->texCoords;
+
+	if (texture != nullptr)
+	{
+		//delete texture;
+		texture = nullptr;
+	}
 }
 
 std::vector<Coord3D*> * DrawableObjectBase::getVertices()
