@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
 	glutIgnoreKeyRepeat(1);
 
-	loadLevel(3);
+	loadLevel(2);
 
 	glShadeModel(GL_SMOOTH);
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
 	glutMainLoop();

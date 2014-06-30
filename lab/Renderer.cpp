@@ -25,11 +25,13 @@ void ::Renderer::createDisplayList()
 				std::vector<Coord3D* > * normals = drawable->getNormals();
 				std::vector<Coord2D* > * texCoords = drawable->getTexCoords();
 
+				int iterationSize = vertices->size() / drawable->getIterations();
+
 				for (int j = 0; j < drawable->getIterations(); j++)
 				{
 					glBegin(drawable->getObjectType()); // request object type
 
-					for (int i = j * drawable->getIterations(); i < (j + 1) * drawable->getIterations(); i++)
+					for (int i = j * iterationSize; i < (j + 1) * iterationSize; i++)
 					{
 						glTexCoord2fv(texCoords->at(i)->toArray());
 						glNormal3fv(normals->at(i)->toArray());
