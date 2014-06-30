@@ -52,7 +52,7 @@ void checkforExit(float x, float z);
 Window * window = nullptr;
 Maze * maze = nullptr;
 long lastRender = 0;
-float translationUnit = 0.003;
+float translationUnit = 0.0015;
 vector<long> * lastRenderDurations = new vector<long>(5);
 
 map<int, int> levelindex;
@@ -99,7 +99,6 @@ int main(int argc, char **argv)
 	Color * superDarkGrey = new Color(0.02f, 0.02f, 0.02f);
 	GLfloat * material = white->toArray();
 
-	// TODO test if needed
 	glMaterialfv(GL_FRONT, GL_AMBIENT, material);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, material);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, material);
@@ -118,7 +117,6 @@ int main(int argc, char **argv)
 
 void loadLevel(int index)
 {
-
 	Renderer::getInstance().clear();
 
 	if (maze != nullptr)
@@ -196,6 +194,7 @@ void loadLevel(int index)
 
 	// create display list out of all objects
 	Renderer::getInstance().createDisplayList();
+
 	const char * c;
 	std::string s;
 	if (index > 0)

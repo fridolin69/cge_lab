@@ -166,5 +166,20 @@ void Box::generate()
 
 Box::~Box()
 {
+	for (unsigned int i = 0; i < vertices->size(); i = i + 6)
+	{
+		delete normals->at(i);
+	}
 
+	for (unsigned int i = 0; i < vertices->size(); i = i++)
+	{
+		delete texCoords->at(i);
+	}
+
+	delete A, B, C, D, E, F, G, H;
+
+	delete this->position;
+	delete this->vertices;
+	delete this->normals;
+	delete this->texCoords;
 }

@@ -15,7 +15,19 @@ Plate::Plate(Coord3D* position, GLfloat zWidth, GLfloat size, TgaTexture* textur
 
 Plate::~Plate()
 {
+	delete normals->at(0);
 
+	for (unsigned int i = 0; i < vertices->size(); i = i++)
+	{
+		delete texCoords->at(i);
+	}
+
+	delete A, B, C, D;
+
+	delete this->position;
+	delete this->vertices;
+	delete this->normals;
+	delete this->texCoords;
 }
 
 void Plate::generate()

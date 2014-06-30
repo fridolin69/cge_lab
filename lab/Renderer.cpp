@@ -83,4 +83,6 @@ void Renderer::clear()
 	for_each(displayLists->begin(), displayLists->end(), [](GLuint list) -> void {
 		glDeleteLists(list, 1);
 	});
+
+	displayLists->clear();
 }
