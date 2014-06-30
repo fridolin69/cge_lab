@@ -54,27 +54,53 @@ int main(int argc, char **argv)
 	camera.setPos(-2, 0.5f, -2);
 
 	// set up window
-	window = new Window(1680, 1050, "Lab Display");
+	window = new Window(800, 768, "Lab Display");
 	window->create();
 
 	// read maze file
-	maze = new Maze("C:\\maze2_unicursal.txt");
+	maze = new Maze("C:\\maze.txt");
 	maze->parse();
 
 	// load textures
 	TgaTexture * boxTga = new TgaTexture("C:\\box.tga", GL_CLAMP);
 	TgaTexture * sandTga = new TgaTexture("C:\\sand.tga", GL_REPEAT);
 
+	TgaTexture * launchTga = new TgaTexture("C:\\launch_DIFFUSE.tga", GL_CLAMP);
+	TgaTexture * sandstoneTga = new TgaTexture("C:\\kt_stone_2.tga", GL_CLAMP);
+
 	// generate maze
-	maze->walk([boxTga](int x, int y) -> void {
-		Vertex3D * position = new Vertex3D(x, 0, y);
-		Box * box = new Box(position, 1, boxTga);
-		Renderer::getInstance().addDrawableObject(box);
-	},
-		nullptr);
+	maze->walk(
+		
+		[boxTga](int x, int y) -> void 
+		{
+			Vertex3D * position = new Vertex3D(x, 0, y);
+			Box * box = new Box(position, 1, boxTga);
+			Renderer::getInstance().addDrawableObject(box);
+		}
+		,
+		nullptr
+		,
+		[launchTga,sandstoneTga](int x, int y, int level, char field) -> void
+		{
 
+			if (field == 'x')
+			{
+				Vertex3D * position = new Vertex3D(x, 0, y);
+				Box * box = new Box(position, 0.3 ,1, sandstoneTga);
+				Renderer::getInstance().addDrawableObject(box);
+			}
+			else if (field == 's')
+			{
+				Vertex3D * position = new Vertex3D(x, 0, y);
+				Box * box = new Box(position,0.001 ,1, launchTga);
+				Renderer::getInstance().addDrawableObject(box);
+			}
 
-	Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getWidth() + 2, sandTga);
+			}
+
+		);
+
+		Plate * floor = new Plate(new Vertex3D(-1, 0, -1), maze->getHeight() +2, maze->getWidth() + 2, sandTga);
 	floor->generate();
 	Renderer::getInstance().addDrawableObject(floor);
 
@@ -227,7 +253,16 @@ bool canMoveTo(float x, float z)
 	x = floor(x);
 	z = floor(z);
 	cout << "Checking access to " << x << " | " << z << endl;
-	return maze->at(x, z) == ' ';
+	//TODO
+	/*if (maze->at(x, z) == ' ')
+	{
+		return true;
+	}*/
+	if (maze->at(x, z) == '#' || maze->at(x, z) == 'x')
+	{
+		return false;
+	}
+	return true;
 }
 
 void mouseMotion(int x, int y)

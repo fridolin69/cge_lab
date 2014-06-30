@@ -1,11 +1,12 @@
 #include "Util.h"
 #include "Plate.h"
 
-Plate::Plate(Vertex3D* position, GLfloat size, TgaTexture* texture)
+Plate::Plate(Vertex3D* position, GLfloat zWidth, GLfloat size, TgaTexture* texture)
 	: DrawableObjectBase(position, texture), size(size)
 {
 	this->vertexCount = 4;
 	this->type = GL_QUADS;
+	this->zWidth = zWidth;
 }
 
 Plate::~Plate()
@@ -21,19 +22,19 @@ Plate::~Plate()
 
 void Plate::generate()
 {
-	this->cornerA = new Vertex3D(0, 0, size);
-	this->cornerB = new Vertex3D(size, 0, size);
-	this->cornerC = new Vertex3D(size, 0, 0);
-	this->cornerD = new Vertex3D(0, 0, 0);
+	this->cornerA = new Vertex3D( 0,    0,   zWidth);
+	this->cornerB = new Vertex3D( size, 0,   zWidth);
+	this->cornerC = new Vertex3D( size, 0,   0);
+	this->cornerD = new Vertex3D( 0,    0,   0);
 
 	texCoords = new TexCoords *[this->vertexCount];
-	vertices = new Vertex3D *[this->vertexCount];
-	normals = new Vertex3D *[this->vertexCount];
+	vertices =  new Vertex3D  *[this->vertexCount];
+	normals =   new Vertex3D  *[this->vertexCount];
 
-	texCoords[0] = new TexCoords(0.0f, 0.0f);
-	texCoords[1] = new TexCoords(size, 0.0f);
-	texCoords[2] = new TexCoords(size, size);
-	texCoords[3] = new TexCoords(0.0f, size);
+	texCoords[0] = new TexCoords(  0.0f,   0.0f  );
+	texCoords[1] = new TexCoords(  size,   0.0f  );
+	texCoords[2] = new TexCoords(  size,   zWidth);
+	texCoords[3] = new TexCoords(  0.0f,   zWidth);
 
 	Vertex3D * normalBottom = Util::normal(cornerA, cornerB, cornerC, cornerD);
 

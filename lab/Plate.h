@@ -11,8 +11,10 @@ private:
 	Vertex3D * cornerD;
 
 	GLfloat size;
+	GLfloat zWidth;
 public:
-	Plate(Vertex3D* position, GLfloat size, TgaTexture* texture);
+	Plate(Vertex3D* position, GLfloat zWidth, GLfloat size, TgaTexture* texture);
+
 	virtual ~Plate();
 
 	void generate() override;

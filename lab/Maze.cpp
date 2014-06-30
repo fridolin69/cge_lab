@@ -24,18 +24,40 @@ char Maze::at(int x, int y)
 	return maze->at(y)->at(x);
 }
 
-void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback)
+void Maze::walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback, function<void(int, int, int,char)> launchCallback)
 {
+	int levelnumber = 0;
+
 	for (int x = 0; x < width; x++)
 	{
 		for (int y = 0; y < height; y++)
 		{
-			if (maze->at(y)->at(x) == '#' && boxCallback != nullptr)
+			
+			//#   # # # for the menu
+			//#       #
+			//#       #
+			//# s s s #
+			//# s x s #
+			//# s s s #
+			//#       #
+			//#       #
+
+			if (maze->at(y)->at(x) == 's' && launchCallback != nullptr)
+			{
+				launchCallback(x, y, -1, 's');
+			}
+			else if (maze->at(y)->at(x) == 'x' && launchCallback != nullptr)//found new level entry
+			{
+				launchCallback(x, y, ++levelnumber,'x');
+			}
+
+
+			else if (maze->at(y)->at(x) == '#' && boxCallback != nullptr)
 			{
 				boxCallback(x, y);
 			}
 
-			if (maze->at(y)->at(x) == ' ' && pathCallback != nullptr)
+			else if (maze->at(y)->at(x) == ' ' && pathCallback != nullptr)
 			{
 				pathCallback(x, y);
 			}
@@ -99,9 +121,25 @@ void Maze::parse()
 			maze->at(y)->push_back(' ');
 			break;
 
+		case 's':
+			x++;
+			maze->at(y)->push_back('s');
+			break;
+
+		case 'x':
+			x++;
+			maze->at(y)->push_back('x');
+			break;
+
+		case 'f':
+			x++;
+			maze->at(y)->push_back('f');
+			break;
+
 		case -1:
 			continue;
 		}
+		this ->parsed = true;
 	}
 
 	maze->resize(maze->size() - 1);

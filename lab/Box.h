@@ -17,9 +17,12 @@ private:
 	Vertex3D * cornerH;
 
 	GLfloat size;
+	GLfloat height;
 
 public:
 	Box(Vertex3D* position, GLfloat size, TgaTexture* texture);
+	Box(Vertex3D* position, GLfloat height, GLfloat width, TgaTexture* texture);
+	
 	virtual ~Box();
 
 	void generate() override;

@@ -6,23 +6,32 @@ Box::Box(Vertex3D* position, GLfloat size, TgaTexture* texture)
 {
 	this->vertexCount = 24;
 	this->type = GL_QUADS;
+	this->height = size;
+}
+
+Box::Box(Vertex3D* position, GLfloat height, GLfloat size, TgaTexture* texture)
+	: DrawableObjectBase(position, texture), size(size)
+{
+	this->vertexCount = 24;
+	this->type = GL_QUADS;
+	this->height = height;
 }
 
 void Box::generate()
 {
-	this->cornerA = new Vertex3D(0, 0, size);
-	this->cornerB = new Vertex3D(size, 0, size);
-	this->cornerC = new Vertex3D(size, 0, 0);
-	this->cornerD = new Vertex3D(0, 0, 0);
+	this->cornerA = new Vertex3D(0,    0,    size);
+	this->cornerB = new Vertex3D(size, 0,    size);
+	this->cornerC = new Vertex3D(size, 0,    0);
+	this->cornerD = new Vertex3D(0,    0,    0);
 
-	this->cornerE = new Vertex3D(0, size, size);
-	this->cornerF = new Vertex3D(size, size, size);
-	this->cornerG = new Vertex3D(size, size, 0);
-	this->cornerH = new Vertex3D(0, size, 0);
+	this->cornerE = new Vertex3D(0,    height, size);
+	this->cornerF = new Vertex3D(size, height, size);
+	this->cornerG = new Vertex3D(size, height, 0);
+	this->cornerH = new Vertex3D(0,    height, 0);
 
 	texCoords = new TexCoords *[this->vertexCount];
-	vertices = new Vertex3D *[this->vertexCount];
-	normals = new Vertex3D *[this->vertexCount];
+	vertices =  new Vertex3D  *[this->vertexCount];
+	normals =   new Vertex3D  *[this->vertexCount];
 
 	auto texCor1 = new TexCoords(0.0f, 0.0f);
 	auto texCor2 = new TexCoords(1, 0.0f);

@@ -21,7 +21,7 @@ public:
 	void parse();
 	char at(int x, int y);
 
-	void walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback);
+	void walk(function<void(int, int)> boxCallback, function<void(int, int)> pathCallback, function<void(int, int, int, char)> launchCallback);
 
 	int getWidth();
 	int getHeight();
